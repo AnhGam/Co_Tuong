@@ -12,7 +12,7 @@ namespace Chinese_Chess.Models
         public List<Piece> Pieces { get; set; } = new List<Piece>();
         public List<Move> Moves { get; set; } = new List<Move>();
         public PieceColor CurrentTurn { get; set; } = PieceColor.Red;
-
+        public bool IsFlipped => CurrentTurn == PieceColor.Black;
         public Piece GetPieceAt(int x, int y)
             => Pieces.FirstOrDefault(p => p.X == x && p.Y == y && p.IsAlive);
 

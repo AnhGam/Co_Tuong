@@ -66,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\CoordinateHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -105,8 +106,6 @@
     <Folder Include="Assets\ImagePiece\" />
     <Folder Include="Assets\Sound\" />
     <Folder Include="Assets\TextPiece\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="NewFolder1\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Views\" />
