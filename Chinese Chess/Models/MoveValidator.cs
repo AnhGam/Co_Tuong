@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Chinese_Chess.Models
 {
@@ -67,22 +68,23 @@ namespace Chinese_Chess.Models
             return true;
         }
 
-        // Kiểm tra xem tướng có bị chiếu không sau nước đi (cần fix)
-        public static bool IsInCheck(BoardState boardState, PieceColor color,int ToX, int ToY)
+        // Kiểm tra xem tướng có bị chiếu không sau nước đi bất kì
+        public static bool IfGoCheck(BoardState boardState, Move move)
         {
-            var general = boardState.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color == color && p.IsAlive);
-            if (general == null) return false;
-            foreach (var piece in boardState.Pieces.Where(p => p.Color != color && p.IsAlive))
-            {
-                var hypotheticalMove = new Move(piece, piece.X, piece.Y, ToX, ToY);
-                if (IsValidMove(boardState, hypotheticalMove))
-                {
-                    return true;
-                }
-            }
-            return false;
+            var tempBoard = boardState.Clone();
+
+            var movingPiece = tempBoard.GetPieceAt(move.FromX, move.FromY);
+            var capturedPiece = tempBoard.GetPieceAt(move.ToX, move.ToY);
+
+            if (capturedPiece != null)
+                capturedPiece.IsAlive = false;
+
+            movingPiece.X = move.ToX;
+            movingPiece.Y = move.ToY;
+
+            return IsInCheck(tempBoard, move.MovedPiece.Color);
         }
-        // Kiểm tra bị chiếu không (cần fix)
+        // Kiểm tra bị chiếu không 
         public static bool IsInCheck(BoardState boardState, PieceColor color)
         {
             var general = boardState.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color == color && p.IsAlive);
@@ -99,10 +101,33 @@ namespace Chinese_Chess.Models
         }
         private static bool IsValidGeneralMove(BoardState boardState, Move move)
         {
-            // Implement General move validation logic
-            if(move.ToX<3 || move.ToX>5 || move.ToY <7 || move.ToY>9)
+            var general = boardState.GetPieceAt(move.FromX, move.FromY);
+            var enemyGeneral = boardState.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color != general.Color && p.IsAlive);
+            if (move.ToX<3 || move.ToX>5 || move.ToY <7 || move.ToY>9)
                 return false;
+            if(boardState.GetPieceAt(move.ToX, move.ToY)?.Color == general.Color)
+                return false;
+            if (Math.Abs(move.ToX - move.FromX) + Math.Abs(move.ToY - move.FromY) != 1)
+                return false;
+            if (enemyGeneral != null && move.ToX == enemyGeneral.X)
+            {
+                bool hasBlockingPiece = false;
+                int minY = Math.Min(move.ToY, enemyGeneral.Y);
+                int maxY = Math.Max(move.ToY, enemyGeneral.Y);
 
+                for (int y = minY + 1; y < maxY; y++)
+                {
+                    if (boardState.GetPieceAt(move.ToX, y) != null)
+                    {
+                        hasBlockingPiece = true;
+                        break;
+                    }
+                }
+                if (!hasBlockingPiece)
+                    return false;
+            }
+            if(IfGoCheck(boardState, move))
+                return false;
             return true;
         }
 
@@ -158,6 +183,16 @@ namespace Chinese_Chess.Models
         private static bool IsValidSoldierMove(BoardState boardState, Move move)
         {
             // Implement Soldier move validation logic
+            if(move.ToX < 0 || move.ToX >8 || move.ToY <0 || move.ToY >9)
+                return false;
+            if(boardState.GetPieceAt(move.ToX, move.ToY)?.Color == move.MovedPiece.Color)
+                return false;
+            if(move.ToX <=4 )
+                if(move.ToY != move.FromY || move.ToX-move.FromX !=1)
+                    return false;
+            if(move.ToX >=5)
+            {
+            }
             return true;
         }
     };
