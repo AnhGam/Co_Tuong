@@ -147,7 +147,7 @@ namespace Chinese_Chess.Models
             }
             return safeMoves;
         }
-        //Advisor sai
+
         private static bool IsValidAdvisorMove(BoardState boardState, Move move)
         {
             // Implement Advisor move validation logic
