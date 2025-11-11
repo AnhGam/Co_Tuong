@@ -29,6 +29,7 @@ namespace Chinese_Chess.Models
         public PieceColor Color { get; set; }
 
         // Tọa độ logic trên bàn (0-8, 0-9)
+        // Mặc định bàn cờ là đen ở dưới, đỏ ở trên
         public int X { get; set; }
         public int Y { get; set; }
 

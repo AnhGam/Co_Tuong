@@ -105,7 +105,9 @@ namespace Chinese_Chess.Models
             var enemyGeneral = boardState.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color != general.Color && p.IsAlive);
             if (move.ToX<3 || move.ToX>5 || move.ToY <7 || move.ToY>9)
                 return false;
-            if(boardState.GetPieceAt(move.ToX, move.ToY)?.Color == general.Color)
+            if (move.ToX == move.FromX && move.ToY == move.FromY)
+                return false;
+            if (boardState.GetPieceAt(move.ToX, move.ToY)?.Color == general.Color)
                 return false;
             if (Math.Abs(move.ToX - move.FromX) + Math.Abs(move.ToY - move.FromY) != 1)
                 return false;
@@ -158,11 +160,27 @@ namespace Chinese_Chess.Models
         private static bool IsValidAdvisorMove(BoardState boardState, Move move)
         {
             // Implement Advisor move validation logic
+            if (move.ToX < 3 || move.ToX > 5 || move.ToY < 7 || move.ToY > 9)
+                return false;
+            if (move.ToX == move.FromX && move.ToY == move.FromY)
+                return false;
+            if (boardState.GetPieceAt(move.ToX, move.ToY)?.Color == move.MovedPiece.Color)
+                return false;
+            if (Math.Abs(move.ToX - move.FromX) != 1 || Math.Abs(move.ToY - move.FromY) != 1)
+                return false;
             return true;
         }
         private static bool IsValidElephantMove(BoardState boardState, Move move)
         {
             // Implement Elephant move validation logic
+            if (move.ToX < 0 || move.ToX > 8 || move.ToY < 5 || move.ToY > 9)
+                return false;
+            if (move.ToX == move.FromX && move.ToY == move.FromY)
+                return false;
+            if (boardState.GetPieceAt(move.ToX, move.ToY)?.Color == move.MovedPiece.Color)
+                return false;
+            if (Math.Abs(move.ToX - move.FromX) != 2 || Math.Abs(move.ToY - move.FromY) != 2)
+                return false;
             return true;
         }
         private static bool IsValidHorseMove(BoardState boardState, Move move)
@@ -187,13 +205,20 @@ namespace Chinese_Chess.Models
                 return false;
             if(boardState.GetPieceAt(move.ToX, move.ToY)?.Color == move.MovedPiece.Color)
                 return false;
-            if(move.ToX <=4 )
-                if(move.ToY != move.FromY || move.ToX-move.FromX !=1)
+            if (move.ToX == move.FromX && move.ToY == move.FromY)
+                return false;
+            if (move.FromY >=5 )
+                if(move.ToX != move.FromX || move.ToY-move.FromY != -1)
                     return false;
-            if(move.ToX >=5)
+            if(move.FromY <=4)
             {
+                if(move.ToY-move.FromY != 1 && Math.Abs(move.ToX - move.FromX) + Math.Abs(move.ToY - move.FromY) != 1)
+                    return false;
             }
+            if(IfGoCheck(boardState, move))
+                return false;
             return true;
         }
+
     };
 }
