@@ -52,19 +52,8 @@ namespace Chinese_Chess.Models
 
         private static bool IsPathClear(BoardState boardState, Move move)
         {
-            int deltaX = Math.Sign(move.ToX - move.FromX);
-            int deltaY = Math.Sign(move.ToY - move.FromY);
-            int currentX = move.FromX + deltaX;
-            int currentY = move.FromY + deltaY;
-            while (currentX != move.ToX || currentY != move.ToY)
-            {
-                if (boardState.GetPieceAt(currentX, currentY) != null)
-                {
-                    return false;
-                }
-                currentX += deltaX;
-                currentY += deltaY;
-            }
+            if(CountPiecesInPath(boardState, move) != 0)
+                return false;
             return true;
         }
 
@@ -158,7 +147,7 @@ namespace Chinese_Chess.Models
             }
             return safeMoves;
         }
-        //Advisor sai
+
         private static bool IsValidAdvisorMove(BoardState boardState, Move move)
         {
             // Implement Advisor move validation logic
@@ -187,6 +176,10 @@ namespace Chinese_Chess.Models
             if (!((Math.Abs(dx) == 1 && Math.Abs(dy) == 2) || (Math.Abs(dx) == 2 && Math.Abs(dy) == 1)))
                 return false;
             var direct = Math.Abs(dx)==2 ? Math.Sign(dx) : Math.Sign(dy);
+            var blockX = Math.Abs(dx) == 2 ? move.FromX + direct : move.FromX;
+            var blockY = Math.Abs(dy) == 2 ? move.FromY + direct : move.FromY;
+            if (boardState.GetPieceAt(blockX, blockY) != null)
+                return false;
             return true;
         }
         private static bool IsValidRookMove(BoardState boardState, Move move)

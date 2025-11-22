@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Chinese_Chess.Models
 {
+
     public enum PieceType
     {
         General,   // Tướng
@@ -23,24 +21,67 @@ namespace Chinese_Chess.Models
         Black
     }
 
-    public class Piece
+
+
+    public class Piece : INotifyPropertyChanged
     {
+        // Type và Color không đổi 
         public PieceType Type { get; set; }
         public PieceColor Color { get; set; }
-
-        // Tọa độ logic trên bàn (0-8, 0-9)
-        // Mặc định bàn cờ là đen ở dưới, đỏ ở trên
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public bool IsAlive { get; set; } = true;
-
-        // Dễ binding ảnh sau này
         public string ImagePath { get; set; } = string.Empty;
+
+        private int _x;
+        public int X
+        {
+            get => _x;
+            set
+            {
+                if (_x != value)
+                {
+                    _x = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+
+        private int _y;
+        public int Y
+        {
+            get => _y;
+            set
+            {
+                if (_y != value)
+                {
+                    _y = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
+
+        private bool _isAlive = true;
+        public bool IsAlive
+        {
+            get => _isAlive;
+            set
+            {
+                if (_isAlive != value)
+                {
+                    _isAlive = value;
+                    OnPropertyChanged(); 
+                }
+            }
+        }
 
         public Piece Clone()
         {
             return (Piece)this.MemberwiseClone();
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
