@@ -1,37 +1,90 @@
 ﻿<Page x:Class="Chinese_Chess.Views.GameView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
-      Title="GameView">
+      Title="GameView" Width="993" Height="649">
 
-    <Grid Background="#FFEEEEEE">
+    <Grid Margin="0,0,0,-24">
+        <Grid.Background>
+            <ImageBrush ImageSource="/Views/japanese.jpg"/>
+        </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="650"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="656"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="943*"/>
+            </Grid.ColumnDefinitions>
             <Image x:Name="BoardImage"
                    Source="/Assets/XiangquiBoard.png"
                    Stretch="Uniform"
-                   Width="650"
-                   Height="720"
+                   Width="530"
+                   Height="587"
                    HorizontalAlignment="Left"
-                   VerticalAlignment="Top"/>
+                   VerticalAlignment="Top" Margin="0,36,0,0" Grid.Column="1"/>
+            <Label x:Name="Timer" Content="00:00" Grid.Column="1" Margin="234,0,647,617" FontSize="20" HorizontalAlignment="Center"/>
+            <Canvas Margin="0,36,413,36" Grid.Column="1"/>
+            <StackPanel Grid.Column="1" Margin="10,617,413,-20" Orientation="Horizontal" HorizontalAlignment="Center">
 
-            <Canvas x:Name="BoardCanvas"
-                    Width="650"
-                    Height="720"
-                    IsHitTestVisible="True"
-                    Background="Transparent"
-                    MouseDown="BoardCanvas_MouseDown"/>
+                <Button x:Name="Backward" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image x:Name="Backward_icon" Height="30" Width="30" Source="/Views/backward1.png"/>
+                </Button>
+
+                <Button x:Name="Pause" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image x:Name="Pause_icon" Height="28" Width="30" Source="/Views/pause1.png"/>
+                </Button>
+
+                <Button x:Name="Forward" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image x:Name="Forward_icon" Height="30" Width="30" Source="/Views/backward1.png" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Button>
+
+                <Button x:Name="New_Game" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image x:Name="Renew_icon" Height="29" Width="30" Source="/Views/renew1.png"/>
+                </Button>
+
+                <Button x:Name="Draw_offer" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image x:Name="Draw_icon" Height="30" Width="30" Source="/Views/draw3.png"/>
+                </Button>
+
+                <Button x:Name="Surrender" Margin="10,0,10,0" Width="62" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image Height="30" Width="30" Source="/Views/surrender2.png"/>
+                </Button>
+            </StackPanel>
         </Grid>
 
-        <StackPanel Grid.Column="1" Margin="10">
-            <TextBlock Text="Thông tin ván cờ" FontWeight="Bold" FontSize="18" Margin="0,0,0,10"/>
-            <TextBlock Text="Người chơi: ..." FontSize="14"/>
-            <TextBlock Text="Lượt hiện tại: ..." FontSize="14"/>
+        <StackPanel Grid.Column="1">
+            <Button x:Name="Settings" Height="40" Width="72" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" FontSize="24" Click="Button_Click" FontWeight="Bold" BorderThickness="0,0,0,0">
+                <Image x:Name="Settings_icon" Height="30" Width="30" Source="/Views/setting.png"/>
+            </Button>
+            <Border BorderBrush="#FFE3DFDF" BorderThickness="1" Height="172" Background="#FFF4F4F4" Margin="10,70,40,10" Padding="10,10,10,10" CornerRadius="10,10,10,10">
+                <StackPanel>
+                    <Image x:Name="Player1_avatar" Height="68" Width="72"/>
+                    <TextBlock x:Name="Player1_name" TextWrapping="Wrap" Text="Bot hard"/>
+                    <TextBlock x:Name="Player1_skill" TextWrapping="Wrap" Text="Elo: 2800"/>
+                    <WrapPanel Height="50"/>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="#FFE3DFDF" BorderThickness="1" Height="155" Background="#FFF4F4F4" Padding="10,10,10,10" CornerRadius="10,10,10,10" Margin="10,70,40,10" Cursor="">
+                <StackPanel>
+                    <Image x:Name="Player2_avatar" Height="68" Width="72"/>
+                    <TextBlock x:Name="Player2_name" TextWrapping="Wrap" Text="s1mpleluv"/>
+                    <TextBlock x:Name="Player2_skill" TextWrapping="Wrap" Text="Elo: 2800"/>
+                    <WrapPanel Height="50"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </Grid>
 </Page>
