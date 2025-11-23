@@ -110,11 +110,76 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\Background\" />
+    <Folder Include="Assets\Button\" />
     <Folder Include="Assets\ImagePiece\" />
     <Folder Include="Assets\Sound\" />
     <Folder Include="Assets\TextPiece\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\green_xianxia.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\black_wood.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\bamboo_yellow.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\paper_scroll1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\paper_scoll2.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\frenzy_blue.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\japanese.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\backward1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\pause2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\pause1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\forward1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\renew1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\draw4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\draw1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\draw2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\draw3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\surrender4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\surrender3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\surrender2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\surrender1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\setting.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
