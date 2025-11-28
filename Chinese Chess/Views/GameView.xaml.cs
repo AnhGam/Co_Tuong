@@ -18,14 +18,19 @@ namespace Chinese_Chess.Views
     /// <summary>
     /// Interaction logic for GameView.xaml
     /// </summary>
-    public partial class GameView : Page
+    public partial class GameView : Window
     {
         public GameView()
         {
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
