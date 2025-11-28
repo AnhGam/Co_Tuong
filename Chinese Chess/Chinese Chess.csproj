@@ -110,11 +110,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Background\" />
-    <Folder Include="Assets\Button\" />
-    <Folder Include="Assets\ImagePiece\" />
     <Folder Include="Assets\Sound\" />
-    <Folder Include="Assets\TextPiece\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
@@ -180,6 +176,70 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Views\setting.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Button\backward1.png" />
+    <Resource Include="Assets\Button\backward2.png" />
+    <Resource Include="Assets\Button\draw1.png" />
+    <Resource Include="Assets\Button\draw2.png" />
+    <Resource Include="Assets\Button\draw3.png" />
+    <Resource Include="Assets\Button\draw4.png" />
+    <Resource Include="Assets\Button\forward1.png" />
+    <Resource Include="Assets\Button\forward2.png" />
+    <Resource Include="Assets\Button\pause1.png" />
+    <Resource Include="Assets\Button\pause2.png" />
+    <Resource Include="Assets\Button\renew1.png" />
+    <Resource Include="Assets\Button\renew2.png" />
+    <Resource Include="Assets\Button\send_icon.png" />
+    <Resource Include="Assets\Button\setting.png" />
+    <Resource Include="Assets\Button\surrender1.png" />
+    <Resource Include="Assets\Button\surrender2.png" />
+    <Resource Include="Assets\Button\surrender3.png" />
+    <Resource Include="Assets\Button\surrender4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Background\blackwhite_life.jpg" />
+    <Resource Include="Assets\Background\blueyellow_texture.jpg" />
+    <Resource Include="Assets\Background\frenzy_blue.jpg" />
+    <Resource Include="Assets\Background\girl_xianxia.jpg" />
+    <Resource Include="Assets\Background\green_xianxia.jpg" />
+    <Resource Include="Assets\Background\japanese.jpg" />
+    <Resource Include="Assets\Background\koi_white.jpg" />
+    <Resource Include="Assets\Background\paper_scoll2.jpg" />
+    <Resource Include="Assets\Background\paper_scroll1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\ImagePiece\black_advisor_img.png" />
+    <Resource Include="Assets\ImagePiece\black_cannon_img.png" />
+    <Resource Include="Assets\ImagePiece\black_elephant_img.png" />
+    <Resource Include="Assets\ImagePiece\black_general.png" />
+    <Resource Include="Assets\ImagePiece\black_horse_img.png" />
+    <Resource Include="Assets\ImagePiece\black_rook_img.png" />
+    <Resource Include="Assets\ImagePiece\black_soldier_img.png" />
+    <Resource Include="Assets\ImagePiece\red_advisor_img.png" />
+    <Resource Include="Assets\ImagePiece\red_cannon_img.png" />
+    <Resource Include="Assets\ImagePiece\red_elephant_img.png" />
+    <Resource Include="Assets\ImagePiece\red_general.png" />
+    <Resource Include="Assets\ImagePiece\red_horse_img.png" />
+    <Resource Include="Assets\ImagePiece\red_rook_img.png" />
+    <Resource Include="Assets\ImagePiece\red_soldier_img.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\TextPiece\black_advisor_text.png" />
+    <Resource Include="Assets\TextPiece\black_cannon_text.png" />
+    <Resource Include="Assets\TextPiece\black_elephant_text.png" />
+    <Resource Include="Assets\TextPiece\black_general.png" />
+    <Resource Include="Assets\TextPiece\black_horse_text.png" />
+    <Resource Include="Assets\TextPiece\black_rook_text.png" />
+    <Resource Include="Assets\TextPiece\black_soldier_text.png" />
+    <Resource Include="Assets\TextPiece\red_advisor_text.png" />
+    <Resource Include="Assets\TextPiece\red_cannon_text.png" />
+    <Resource Include="Assets\TextPiece\red_elephant_text.png" />
+    <Resource Include="Assets\TextPiece\red_general.png" />
+    <Resource Include="Assets\TextPiece\red_horse_text.png" />
+    <Resource Include="Assets\TextPiece\red_rook_text.png" />
+    <Resource Include="Assets\TextPiece\red_soldier_text.png" />
+    <Resource Include="Assets\XiangquiBoard.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
