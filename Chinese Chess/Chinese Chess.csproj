@@ -110,7 +110,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Sound\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
@@ -181,6 +180,14 @@
   <ItemGroup>
     <Resource Include="Assets\Button\sound_off.png" />
     <Resource Include="Assets\Button\sound_on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Sound\1.mp3" />
+    <Content Include="Assets\Sound\2.mp3" />
+    <Content Include="Assets\Sound\3.mp3" />
+    <Content Include="Assets\Sound\4.mp3" />
+    <Content Include="Assets\Sound\Special.mp3" />
+    <Content Include="Assets\Sound\TriNga~.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
