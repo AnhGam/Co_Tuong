@@ -8,14 +8,14 @@
       WindowStartupLocation="CenterScreen">
 
     <Window.Background>
-        <ImageBrush ImageSource="/Assets/Background/japanese.jpg" Stretch="UniformToFill"/>
+        <ImageBrush ImageSource="/Assets/Background/background.png" Stretch="UniformToFill"/>
     </Window.Background>
 
     <Viewbox Stretch="Uniform">
         <Grid x:Name="MainLayout" Width="1100" Height="700">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="670"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="BoardLayout" Grid.Column="0">
@@ -28,7 +28,7 @@
                 <Label x:Name="GameTimerLabel" Content="00:00" Grid.Row="0" 
                        FontSize="20" FontWeight="Bold" 
                        HorizontalAlignment="Center" VerticalAlignment="Top"
-                       Margin="0,5,0,0"/>
+                       Margin="0,0,0,0"/>
 
                 <Viewbox Grid.Row="1" Stretch="Uniform" Margin="0,5">
                     <Grid Width="600" Height="640">
@@ -37,116 +37,151 @@
                     </Grid>
                 </Viewbox>
 
-                <StackPanel x:Name="ControlBarPanel" Grid.Row="2" Orientation="Horizontal" 
-                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,10">
-                    <Button x:Name="Backward" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0" Click="Backward_Click">
-                        <Image Source="/Assets/Button/backward1.png"/>
+                <UniformGrid x:Name="ControlBarPanel" Grid.Row="2" Rows="1" Width="600" 
+                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+
+                    <Button x:Name="Backward" Background="Transparent" BorderThickness="0" Click="Backward_Click">
+                        <StackPanel>
+                            <Image Source="/Assets/Button/backward1.png" Height="30" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Lùi lại" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                    <Button x:Name="Pause" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0" Click="Pause_Click">
-                        <Image x:Name="Pause_icon" Source="/Assets/Button/pause1.png"/>
+
+                    <Button x:Name="Pause" Background="Transparent" BorderThickness="0" Click="Pause_Click">
+                        <StackPanel>
+                            <Image x:Name="Pause_icon" Source="/Assets/Button/pause1.png" Height="30" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Tạm dừng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                    <Button x:Name="Forward" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0" Click="Forward_Click">
-                        <Image Source="/Assets/Button/backward1.png" RenderTransformOrigin="0.5,0.5">
-                            <Image.RenderTransform>
-                                <ScaleTransform ScaleX="-1"/>
-                            </Image.RenderTransform>
-                        </Image>
+
+                    <Button x:Name="Forward" Background="Transparent" BorderThickness="0" Click="Forward_Click">
+                        <StackPanel>
+                            <Image Source="/Assets/Button/backward1.png" Height="30" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="-1"/>
+                                </Image.RenderTransform>
+                            </Image>
+                            <TextBlock Text="Đi tiếp" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                    <Button x:Name="New_Game" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0" Click="New_Game_Click">
-                        <Image Source="/Assets/Button/renew1.png"/>
+
+                    <Button x:Name="New_Game" Background="Transparent" BorderThickness="0" Click="New_Game_Click">
+                        <StackPanel>
+                            <Image Source="/Assets/Button/renew1.png" Height="30" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ván mới" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                    <Button x:Name="Draw_offer" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0">
-                        <Image Source="/Assets/Button/draw3.png"/>
+
+                    <Button x:Name="Draw_offer" Background="Transparent" BorderThickness="0">
+                        <StackPanel>
+                            <Image Source="/Assets/Button/draw10.png" Height="30" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Cầu hòa" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                    <Button x:Name="Surrender" Margin="15,0" Width="40" Background="Transparent" BorderThickness="0">
-                        <Image Source="/Assets/Button/surrender2.png"/>
+
+                    <Button x:Name="Surrender" Background="Transparent" BorderThickness="0">
+                        <StackPanel>
+                            <Image Source="/Assets/Button/surrender10.png" Height="30" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Đầu hàng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
                     </Button>
-                </StackPanel>
+                </UniformGrid>
             </Grid>
 
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Margin="20,10,20,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                <Grid Margin="20,10,10,30">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                    <Button x:Name="MuteButton" Width="35" Height="35" Margin="0,0,10,0" Background="Transparent" BorderThickness="0" Click="MuteButton_Click">
+                        <Image x:Name="SoundIcon" Source="/Assets/Button/sound_on.png"/>
+                    </Button>
+                    <Button x:Name="Settings" Width="35" Height="35" Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
+                        <Image Source="/Assets/Button/setting.png"/>
+                    </Button>
+                </StackPanel>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                        <Button x:Name="MuteButton" Width="35" Height="35" Margin="0,0,10,0" 
-                                Background="Transparent" BorderThickness="0" Click="MuteButton_Click">
-                            <Image x:Name="SoundIcon" Source="/Assets/Button/sound_on.png"/>
-                        </Button>
-                        <Button x:Name="Settings" Width="35" Height="35" 
-                                Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
-                            <Image Source="/Assets/Button/setting.png"/>
-                        </Button>
-                    </StackPanel>
+                <StackPanel x:Name="SidePanel" Grid.Row="1" VerticalAlignment="Center">
 
-                    <StackPanel x:Name="SidePanel" Grid.Row="1" VerticalAlignment="Center">
-                        <Border x:Name="Player1Card" Height="160" Margin="0,0,0,10" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
-                            <Grid Margin="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Image x:Name="Player1_avatar" Source="/Assets/ImagePiece/black_general.png" Width="80" Height="80" VerticalAlignment="Top"/>
-                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                    <TextBlock x:Name="Player1_name" Text="Bot Hard" FontWeight="Bold" FontSize="18"/>
-                                    <TextBlock x:Name="Player1_elo" Text="Elo: 2800" Foreground="Gray" Margin="0,5,0,0"/>
+                    <Border x:Name="Player1Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image x:Name="Player1_avatar" Source="/Assets/ImagePiece/black_general.png" Width="70" Height="70" VerticalAlignment="Top"/>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <TextBlock x:Name="Player1_name" Text="Bot Hard" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock x:Name="Player1_elo" Text="Elo: 2800" Foreground="Gray" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="P1CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
+                                <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <Image Source="/Assets/TextPiece/red_soldier_text.png" Width="25" Margin="1"/>
+                                <Image Source="/Assets/TextPiece/red_advisor_text.png" Width="25" Margin="1"/>
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border x:Name="Player2Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image x:Name="Player2_avatar" Source="/Assets/ImagePiece/red_general.png" Width="70" Height="70" VerticalAlignment="Top"/>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <TextBlock x:Name="Player2_name" Text="Player 1" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock x:Name="Player2_elo" Text="Elo: 1200" Foreground="Gray" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="P2CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
+                                <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <Image Source="/Assets/TextPiece/black_rook_text.png" Width="25" Margin="1"/>
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border x:Name="ChatBoxCard" Height="220" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ScrollViewer x:Name="ChatHistoryScroll" Margin="10">
+                                <StackPanel>
+                                    <TextBlock Text="System: Game started..." Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                    <TextBlock Text="System: Bot is thinking..." Foreground="Gray" TextWrapping="Wrap"/>
                                 </StackPanel>
-                                <WrapPanel x:Name="P1CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,10,0,0">
-                                    <TextBlock Text="Đã ăn: " Foreground="Silver"/>
-                                </WrapPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border x:Name="ChatBoxCard" Height="200" Margin="0,0,0,10" Background="White" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <ScrollViewer x:Name="ChatHistoryScroll" Margin="10">
-                                    <TextBlock x:Name="ChatHistoryText" Text="System: Game started..." Foreground="Gray" TextWrapping="Wrap"/>
-                                </ScrollViewer>
-                                <Grid Grid.Row="1" Margin="5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox x:Name="ChatInputBox" Height="30" VerticalContentAlignment="Center"/>
-                                    <Button x:Name="SendButton" Grid.Column="1" Width="30" Height="30" Margin="5,0,0,0" Background="Transparent" BorderThickness="0">
-                                        <Image Source="/Assets/Button/send_icon.png" Stretch="Uniform"/>
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Border>
-
-                        <Border x:Name="Player2Card" Height="160" Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
-                            <Grid Margin="10">
+                            </ScrollViewer>
+                            <Grid Grid.Row="1" Margin="10">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Image x:Name="Player2_avatar" Source="/Assets/ImagePiece/red_general.png" Width="80" Height="80" VerticalAlignment="Top"/>
-                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                    <TextBlock x:Name="Player2_name" Text="Player 1" FontWeight="Bold" FontSize="18"/>
-                                    <TextBlock x:Name="Player2_elo" Text="Elo: 1200" Foreground="Gray" Margin="0,5,0,0"/>
-                                </StackPanel>
-                                <WrapPanel x:Name="P2CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,10,0,0">
-                                    <TextBlock Text="Đã ăn: " Foreground="Silver"/>
-                                    <Image Source="/Assets/TextPiece/red_rook_text.png" Width="27" Margin="2"/>
-                                </WrapPanel>
+                                <TextBox x:Name="ChatInputBox" Height="30" VerticalContentAlignment="Center" Background="White" BorderBrush="#CCC"/>
+                                <Button x:Name="SendButton" Grid.Column="1" Width="30" Height="30" Margin="5,0,0,0" Background="Transparent" BorderThickness="0">
+                                    <Image Source="/Assets/Button/send_icon.png" Stretch="Uniform"/>
+                                </Button>
                             </Grid>
-                        </Border>
-                    </StackPanel>
-                </Grid>
+                        </Grid>
+                    </Border>
+                </StackPanel>
 
-                <TextBlock x:Name="RealTimeClock" Text="Loading..." 
+                <TextBlock x:Name="RealTimeClock" Grid.Row="2" Text="Loading..." 
                            FontSize="12" Foreground="#FFD91E1E" FontWeight="SemiBold"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-                           Margin="0,0,5,5"/>
+                           Margin="0,5,0,0"/>
             </Grid>
         </Grid>
     </Viewbox>
