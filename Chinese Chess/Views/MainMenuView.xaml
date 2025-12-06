@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="Chinese_Chess.Views.MainMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             FontFamily="Georgia">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#b89569"/>
+        <SolidColorBrush x:Key="BackgroundDarkBrush" Color="#1a130c"/>
+        <SolidColorBrush x:Key="SurfaceDarkBrush" Color="#2a221a"/>
+        <SolidColorBrush x:Key="TextDarkBrush" Color="#e6d5b8"/>
+
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource BackgroundDarkBrush}"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                BorderThickness="0">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.3"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}">
+                                <ContentPresenter.Resources>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#d4b082"/>
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="-2"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="OutlineButtonStyle" TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource SurfaceDarkBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="2"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource BackgroundDarkBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource BackgroundDarkBrush}">
+        <Image Source="/Assets/XiangquiBoard.png" Stretch="UniformToFill" Opacity="0.1"/>
+
+		<Grid MaxWidth="1000" Margin="20">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+
+			<StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,40,0,60">
+				<TextBlock Text="CHINESE CHESS"
+                           FontSize="60" FontWeight="Black"
+                           Foreground="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center">
+					<TextBlock.Effect>
+						<DropShadowEffect ShadowDepth="2" BlurRadius="5" Color="Black" Opacity="0.5"/>
+					</TextBlock.Effect>
+				</TextBlock>
+
+				<Grid Margin="0,10,0,0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Separator Grid.Column="0" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+					<TextBlock Grid.Column="1" Text="MASTER CHALLENGE"
+                               FontSize="16" Foreground="{StaticResource TextDarkBrush}"
+                               FontWeight="SemiBold" Margin="20,0"
+                               Typography.Capitals="AllSmallCaps"/>
+					<Separator Grid.Column="2" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+				</Grid>
+			</StackPanel>
+
+			<Grid Grid.Row="1"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+
+				<StackPanel Width="400" VerticalAlignment="Center">
+					<Button Content="NEW GAME" Style="{StaticResource MenuButtonStyle}" Click="NewGameButton_Click"/>
+					<Button Content="SETTINGS" Style="{StaticResource MenuButtonStyle}"/>
+					<Button Content="LEAVE" Style="{StaticResource OutlineButtonStyle}"/>
+
+				</StackPanel>
+
+			</Grid>
+		</Grid>
+    </Grid>
+</UserControl>

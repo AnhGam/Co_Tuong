@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Chinese_Chess.Views;
 
 namespace Chinese_Chess
 {
@@ -23,6 +24,8 @@ namespace Chinese_Chess
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Content = new MainMenuView();
         }
     }
 }

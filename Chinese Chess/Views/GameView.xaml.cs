@@ -19,7 +19,7 @@ namespace Chinese_Chess.Views
     /// <summary>
     /// Interaction logic for GameView.xaml
     /// </summary>
-    public partial class GameView : Window
+    public partial class GameView : UserControl
     {
         DispatcherTimer gameTimer;
         int timeInSeconds = 0;
