@@ -5,16 +5,27 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace Chinese_Chess.ViewModels
 {
     public class GameViewModel : INotifyPropertyChanged
     {
-        // Danh sách quân cờ (Binding ra View)
         public ObservableCollection<Piece> Pieces { get; set; }
         public BoardState BoardLogic { get; set; }
 
-        private Piece _selectedPiece; // Quân đang chọn
+
+        public ObservableCollection<Piece> CapturedRedPieces { get; set; } = new ObservableCollection<Piece>();
+        public ObservableCollection<Piece> CapturedBlackPieces { get; set; } = new ObservableCollection<Piece>();
+
+        private Piece _selectedPiece;
+
+        private string _gameStatus;
+        public string GameStatus
+        {
+            get => _gameStatus;
+            set { _gameStatus = value; OnPropertyChanged(); }
+        }
 
         public GameViewModel()
         {
@@ -27,6 +38,10 @@ namespace Chinese_Chess.ViewModels
         {
             BoardLogic.Reset();
             Pieces.Clear();
+            CapturedRedPieces.Clear();
+            CapturedBlackPieces.Clear();
+            GameStatus = "Đỏ đi trước";
+
             InitStandardBoard();
             BoardLogic.Pieces = Pieces.ToList();
         }
@@ -82,38 +97,92 @@ namespace Chinese_Chess.ViewModels
             {
                 if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
                 {
-                    _selectedPiece = clickedPiece;
-                    MessageBox.Show($"Đã chọn: {clickedPiece.Type} ({x},{y})");
+                    SelectPiece(clickedPiece); 
                 }
                 return;
             }
-
-
             if (clickedPiece == _selectedPiece)
             {
-                _selectedPiece = null;
+                ClearSelection();
                 return;
             }
-
-
             if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
             {
-                _selectedPiece = clickedPiece;
-                MessageBox.Show($"Đổi sang: {clickedPiece.Type}");
+                SelectPiece(clickedPiece);
                 return;
             }
-
-
             var move = new Move(_selectedPiece, _selectedPiece.X, _selectedPiece.Y, x, y);
+
             if (MoveValidator.IsValidMove(BoardLogic, move))
             {
-                if (clickedPiece != null) clickedPiece.IsAlive = false; 
-                BoardLogic.MovePiece(_selectedPiece, x, y); 
-                _selectedPiece = null; 
+                if (clickedPiece != null)
+                {
+                    clickedPiece.IsAlive = false; 
+                    if (clickedPiece.Color == PieceColor.Black)
+                        CapturedRedPieces.Add(clickedPiece);   
+                    else
+                        CapturedBlackPieces.Add(clickedPiece);
+                }
+                BoardLogic.MovePiece(_selectedPiece, x, y);
+                ClearSelection();
+                CheckGameState();
             }
             else
             {
-                MessageBox.Show("Nước đi không hợp lệ!");
+                ClearSelection();
+            }
+        }
+        private void SelectPiece(Piece p)
+        {
+            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
+            _selectedPiece = p;
+            _selectedPiece.IsSelected = true;
+        }
+
+        private void ClearSelection()
+        {
+            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
+            _selectedPiece = null;
+        }
+
+        private void ExecuteMove(Move move, Piece target)
+        {
+
+            if (target != null)
+            {
+                target.IsAlive = false; 
+
+                if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
+                else CapturedBlackPieces.Add(target);
+            }
+
+            BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+            ClearSelection();
+            CheckGameState();
+        }
+
+        private void CheckGameState()
+        {
+            var nextTurn = BoardLogic.CurrentTurn;
+
+            bool canMove = MoveValidator.HasAnyValidMove(BoardLogic, nextTurn);
+
+            if (!canMove)
+            {
+                string winner = (nextTurn == PieceColor.Red ? "ĐEN" : "ĐỎ");
+                GameStatus = $"HẾT CỜ! {winner} THẮNG";
+                MessageBox.Show(GameStatus);
+                return;
+            }
+
+            bool isCheck = MoveValidator.IsInCheck(BoardLogic, nextTurn);
+            if (isCheck)
+            {
+                GameStatus = "CHIẾU TƯỚNG!";
+            }
+            else
+            {
+                GameStatus = nextTurn == PieceColor.Red ? "Lượt Đỏ" : "Lượt Đen";
             }
         }
 

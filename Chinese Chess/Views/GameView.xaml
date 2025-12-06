@@ -54,13 +54,23 @@
                                     <Setter Property="Visibility" Value="{Binding IsAlive, Converter={StaticResource VisConverter}}"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
-
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"/>
+                                    <Grid>
+                                        <Ellipse Width="55" Height="55" Stroke="Yellow" StrokeThickness="3" 
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
+                                            <Ellipse.Effect>
+                                                <BlurEffect Radius="5"/>
+                                            </Ellipse.Effect>
+                                        </Ellipse>
+
+                                        <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
                                 </DataTemplate>
-                             </ItemsControl.ItemTemplate>
-                         </ItemsControl>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                       
                     </Grid>
                 </Viewbox>
@@ -134,10 +144,30 @@
 
                 <StackPanel x:Name="SidePanel" Grid.Row="1" VerticalAlignment="Center">
 
-                    <Border x:Name="Player1Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
-                        </Border.Effect>
+                    <Border x:Name="Player1Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" CornerRadius="10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush" Value="#DDD"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GameStatus}" Value="Lượt Đen">
+                                        <Setter Property="BorderBrush" Value="Orange"/>
+                                        <Setter Property="BorderThickness" Value="3"/>
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect Color="Orange" BlurRadius="15" ShadowDepth="0" Opacity="0.8"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
                         <Grid Margin="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -150,16 +180,46 @@
                             </StackPanel>
                             <WrapPanel x:Name="P1CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
                                 <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <Image Source="/Assets/TextPiece/red_soldier_text.png" Width="25" Margin="1"/>
-                                <Image Source="/Assets/TextPiece/red_advisor_text.png" Width="25" Margin="1"/>
+                                <ItemsControl ItemsSource="{Binding CapturedRedPieces}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding ImagePath}" Width="25" Margin="1"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </WrapPanel>
                         </Grid>
                     </Border>
 
-                    <Border x:Name="Player2Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
-                        </Border.Effect>
+                    <Border x:Name="Player2Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" CornerRadius="10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush" Value="#DDD"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GameStatus}" Value="Lượt Đỏ">
+                                        <Setter Property="BorderBrush" Value="Orange"/>
+                                        <Setter Property="BorderThickness" Value="3"/>
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect Color="Orange" BlurRadius="15" ShadowDepth="0" Opacity="0.8"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
                         <Grid Margin="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -172,7 +232,18 @@
                             </StackPanel>
                             <WrapPanel x:Name="P2CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
                                 <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <Image Source="/Assets/TextPiece/black_rook_text.png" Width="25" Margin="1"/>
+                                <ItemsControl ItemsSource="{Binding CapturedBlackPieces}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding ImagePath}" Width="25" Margin="1"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </WrapPanel>
                         </Grid>
                     </Border>
