@@ -58,6 +58,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\UIConverters.cs" />
+    <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Views\GameView.xaml.cs">
       <DependentUpon>GameView.xaml</DependentUpon>
     </Compile>
@@ -111,7 +113,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Button\backward1.png" />
@@ -182,6 +183,9 @@
     <Resource Include="Assets\Button\sound_on.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\Button\draw10.png" />
+    <Resource Include="Assets\Button\surrender10.png" />
+    <Resource Include="Assets\Background\Background.png" />
     <Content Include="Assets\Sound\1.mp3" />
     <Content Include="Assets\Sound\2.mp3" />
     <Content Include="Assets\Sound\3.mp3" />
