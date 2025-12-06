@@ -12,42 +12,25 @@ namespace Chinese_Chess.Models
     {
         public static bool IsValidMove(BoardState boardState, Move move)
         {
-            if (move.ToX < 0 || move.ToX > 8 || move.ToY < 0 || move.ToY > 9)
-                return false;
-            if (move.ToX == move.FromX && move.ToY == move.FromY)
-                return false;
+            if (move.ToX < 0 || move.ToX > 8 || move.ToY < 0 || move.ToY > 9) return false;
+            if (move.ToX == move.FromX && move.ToY == move.FromY) return false;
             var targetPiece = boardState.GetPieceAt(move.ToX, move.ToY);
-            if (targetPiece != null && targetPiece.Color == move.MovedPiece.Color)
-                return false;
-            if (IfGoCheck(boardState, move))
-                return false;
+            if (targetPiece != null && targetPiece.Color == move.MovedPiece.Color) return false;
 
+            bool isMoveLogicValid = false;
             switch (move.MovedPiece.Type)
             {
-                case PieceType.General:
-                    return IsValidGeneralMove(boardState, move);
-
-                case PieceType.Advisor:
-                    return IsValidAdvisorMove(boardState, move);
-
-                case PieceType.Elephant:
-                    return IsValidElephantMove(boardState, move);
-
-                case PieceType.Horse:
-                    return IsValidHorseMove(boardState, move);
-
-                case PieceType.Rook:
-                    return IsValidRookMove(boardState, move);
-
-                case PieceType.Cannon:
-                    return IsValidCannonMove(boardState, move);
-
-                case PieceType.Soldier:
-                    return IsValidSoldierMove(boardState, move);
-
-                default:
-                    return false;
+                case PieceType.General: isMoveLogicValid = IsValidGeneralMove(boardState, move); break;
+                case PieceType.Advisor: isMoveLogicValid = IsValidAdvisorMove(boardState, move); break;
+                case PieceType.Elephant: isMoveLogicValid = IsValidElephantMove(boardState, move); break;
+                case PieceType.Horse: isMoveLogicValid = IsValidHorseMove(boardState, move); break;
+                case PieceType.Rook: isMoveLogicValid = IsValidRookMove(boardState, move); break;
+                case PieceType.Cannon: isMoveLogicValid = IsValidCannonMove(boardState, move); break;
+                case PieceType.Soldier: isMoveLogicValid = IsValidSoldierMove(boardState, move); break;
             }
+            if (!isMoveLogicValid) return false;
+            if (IfGoCheck(boardState, move)) return false;
+            return true;
         }
 
         private static bool IsPathClear(BoardState boardState, Move move)
@@ -76,21 +59,20 @@ namespace Chinese_Chess.Models
             return count;
         }
 
-        // Kiểm tra xem tướng có bị chiếu không sau nước đi bất kì
         public static bool IfGoCheck(BoardState boardState, Move move)
         {
             var tempBoard = boardState.Clone();
-
             var movingPiece = tempBoard.GetPieceAt(move.FromX, move.FromY);
             var capturedPiece = tempBoard.GetPieceAt(move.ToX, move.ToY);
 
-            if (capturedPiece != null)
-                capturedPiece.IsAlive = false;
-
+            if (capturedPiece != null) capturedPiece.IsAlive = false;
             movingPiece.X = move.ToX;
             movingPiece.Y = move.ToY;
 
-            return IsInCheck(tempBoard, move.MovedPiece.Color);
+            if (IsInCheck(tempBoard, move.MovedPiece.Color)) return true;
+            if (IsGeneralsFacing(tempBoard)) return true;
+
+            return false;
         }
         // Kiểm tra bị chiếu không 
         public static bool IsInCheck(BoardState boardState, PieceColor color)
@@ -109,18 +91,17 @@ namespace Chinese_Chess.Models
         }
         private static bool IsValidGeneralMove(BoardState boardState, Move move)
         {
-            var general = boardState.GetPieceAt(move.FromX, move.FromY);
-            var enemyGeneral = boardState.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color != general.Color && p.IsAlive);
-            if (move.ToX<3 || move.ToX>5 || move.ToY <7 || move.ToY>9)
-                return false;
-            if (Math.Abs(move.ToX - move.FromX) + Math.Abs(move.ToY - move.FromY) != 1)
-                return false;
-            if (enemyGeneral != null && move.ToX == enemyGeneral.X)
+            if (move.MovedPiece.Color == PieceColor.Red)
             {
-                Move GeneralMove = new Move(general, move.FromX, move.FromY, enemyGeneral.X, enemyGeneral.Y);
-                if (!IsPathClear(boardState, GeneralMove))
-                    return false;
+                if (move.ToX < 3 || move.ToX > 5 || move.ToY < 7 || move.ToY > 9) return false;
             }
+            else 
+            {
+                if (move.ToX < 3 || move.ToX > 5 || move.ToY < 0 || move.ToY > 2) return false;
+            }
+            var dx = Math.Abs(move.ToX - move.FromX);
+            var dy = Math.Abs(move.ToY - move.FromY);
+            if (dx + dy != 1) return false;
             return true;
         }
 
@@ -148,29 +129,68 @@ namespace Chinese_Chess.Models
             return safeMoves;
         }
 
+        public static bool HasAnyValidMove(BoardState board, PieceColor color)
+        {
+            var pieces = board.Pieces.Where(p => p.Color == color && p.IsAlive);
+
+            foreach (var piece in pieces)
+            {
+                if (GetSafeMoves(board, piece).Count > 0)
+                    return true;
+            }
+            return false;
+        }
+
         private static bool IsValidAdvisorMove(BoardState boardState, Move move)
         {
-            // Implement Advisor move validation logic
-            if (move.ToX < 3 || move.ToX > 5 || move.ToY < 7 || move.ToY > 9)
-                return false;
-            if (Math.Abs(move.ToX - move.FromX) != 1 || Math.Abs(move.ToY - move.FromY) != 1)
-                return false;
+            if (move.MovedPiece.Color == PieceColor.Red)
+            {
+                if (move.ToX < 3 || move.ToX > 5 || move.ToY < 7 || move.ToY > 9) return false;
+            }
+            else 
+            {
+                if (move.ToX < 3 || move.ToX > 5 || move.ToY < 0 || move.ToY > 2) return false;
+            }
+            if (Math.Abs(move.ToX - move.FromX) != 1 || Math.Abs(move.ToY - move.FromY) != 1) return false;
             return true;
+        }
+        public static bool IsGeneralsFacing(BoardState board)
+        {
+            var redGeneral = board.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color == PieceColor.Red && p.IsAlive);
+            var blackGeneral = board.Pieces.FirstOrDefault(p => p.Type == PieceType.General && p.Color == PieceColor.Black && p.IsAlive);
+
+            if (redGeneral == null || blackGeneral == null) return false; // Không thể xảy ra trong game chuẩn
+
+            if (redGeneral.X != blackGeneral.X) return false;
+
+            int minYi = Math.Min(redGeneral.Y, blackGeneral.Y);
+            int maxYi = Math.Max(redGeneral.Y, blackGeneral.Y);
+
+            int obstacleCount = board.Pieces.Count(p => p.IsAlive && p.X == redGeneral.X && p.Y > minYi && p.Y < maxYi);
+            return obstacleCount == 0;
         }
         private static bool IsValidElephantMove(BoardState boardState, Move move)
         {
-            // Implement Elephant move validation logic
-            if (move.ToX < 0 || move.ToX > 8 || move.ToY < 5 || move.ToY > 9)
-                return false;
+            if (move.MovedPiece.Color == PieceColor.Red)
+            {
+                if (move.ToY < 5 || move.ToY > 9) return false;
+            }
+            else
+            {
+                if (move.ToY < 0 || move.ToY > 4) return false;
+            }
+
             if (Math.Abs(move.ToX - move.FromX) != 2 || Math.Abs(move.ToY - move.FromY) != 2)
                 return false;
-            if(IfGoCheck(boardState, move))
+
+            int midX = (move.FromX + move.ToX) / 2;
+            int midY = (move.FromY + move.ToY) / 2;
+            if (boardState.GetPieceAt(midX, midY) != null)
                 return false;
             return true;
         }
         private static bool IsValidHorseMove(BoardState boardState, Move move)
         {
-            // Implement Horse move validation logic
             var dx = move.ToX - move.FromX;
             var dy = move.ToY - move.FromY;
             if (!((Math.Abs(dx) == 1 && Math.Abs(dy) == 2) || (Math.Abs(dx) == 2 && Math.Abs(dy) == 1)))
@@ -184,7 +204,6 @@ namespace Chinese_Chess.Models
         }
         private static bool IsValidRookMove(BoardState boardState, Move move)
         {
-            // Implement Rook move validation logic
             if ((move.ToX != move.FromX && move.ToY != move.FromY) || (move.ToX == move.FromX && move.ToY == move.FromY))
                     return false;
             if (!IsPathClear(boardState, move))
@@ -193,7 +212,6 @@ namespace Chinese_Chess.Models
         }
         private static bool IsValidCannonMove(BoardState boardState, Move move)
         {
-            // Implement Cannon move validation logic
             var enemy = boardState.GetPieceAt(move.ToX, move.ToY);
             if (move.ToX != move.FromX && move.ToY != move.FromY)
                     return false;
@@ -211,14 +229,38 @@ namespace Chinese_Chess.Models
         }
         private static bool IsValidSoldierMove(BoardState boardState, Move move)
         {
-            // Implement Soldier move validation logic
-            if (move.FromY >=5 )
-                if(move.ToX != move.FromX || move.ToY-move.FromY != -1)
-                    return false;
-            if(move.FromY <=4)
+            int dx = move.ToX - move.FromX;
+            int dy = move.ToY - move.FromY;
+            if (move.MovedPiece.Color == PieceColor.Red)
             {
-                if(move.ToY-move.FromY != 1 && Math.Abs(move.ToX - move.FromX) + Math.Abs(move.ToY - move.FromY) != 1)
+                if (dy > 0) return false;
+
+                if (move.FromY > 4)
+                {
+                    if (dx != 0 || dy != -1) return false;
+                }
+
+                else
+                {
+                    if (dy == -1 && dx == 0) return true; 
+                    if (dy == 0 && Math.Abs(dx) == 1) return true; 
+                    return false; 
+                }
+            }
+
+            else
+            {
+                if (dy < 0) return false;
+                if (move.FromY < 5)
+                {
+                    if (dx != 0 || dy != 1) return false;
+                }
+                else
+                {
+                    if (dy == 1 && dx == 0) return true;
+                    if (dy == 0 && Math.Abs(dx) == 1) return true;
                     return false;
+                }
             }
             return true;
         }

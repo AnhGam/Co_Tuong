@@ -71,7 +71,12 @@ namespace Chinese_Chess.Models
                 }
             }
         }
-
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
         public Piece Clone()
         {
             return (Piece)this.MemberwiseClone();
