@@ -1,30 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chinese_Chess.Helpers
 {
     public static class CoordinateHelper
     {
-        public const int CellSize = 70;
 
-        public const int OffsetX = 30;
-        public const int OffsetY = 30;
+        public const int CellWidth = 60;
+        public const int CellHeight = 58;
+        public const int OffsetX = 60;
+        public const int OffsetY = 60;
+
+        public const int ClickRadius = 25;
+
 
         public static (int x, int y) ToPixelCoordinate(int col, int row)
         {
-            int x = OffsetX + col * CellSize;
-            int y = OffsetY + row * CellSize;
+
+            int x = OffsetX + col * CellWidth;
+            int y = OffsetY + row * CellHeight;
             return (x, y);
         }
 
-        public static (int x, int y) ToBoardCoordinate(int pixelX, int pixelY)
+
+        public static (int col, int row) GetExactCoordinate(double mouseX, double mouseY)
         {
-            int col = (pixelX - OffsetX + CellSize / 2) / CellSize;
-            int row = (pixelY - OffsetY + CellSize / 2) / CellSize;
-            return (col, row);
+
+            int col = (int)Math.Round((mouseX - OffsetX) / CellWidth);
+            int row = (int)Math.Round((mouseY - OffsetY) / CellHeight);
+
+
+            double centerX = OffsetX + col * CellWidth;
+            double centerY = OffsetY + row * CellHeight;
+
+ 
+            double distance = Math.Sqrt(Math.Pow(mouseX - centerX, 2) + Math.Pow(mouseY - centerY, 2));
+
+            if (distance <= ClickRadius && col >= 0 && col <= 8 && row >= 0 && row <= 9)
+            {
+                return (col, row);
+            }
+
+            return (-1, -1);
         }
     }
 }
