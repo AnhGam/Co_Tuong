@@ -59,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers\UIConverters.cs" />
+    <Compile Include="Models\HighlightSpot.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Views\ChallengeView.xaml.cs">
       <DependentUpon>ChallengeView.xaml</DependentUpon>

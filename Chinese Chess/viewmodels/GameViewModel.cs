@@ -14,7 +14,7 @@ namespace Chinese_Chess.ViewModels
         public ObservableCollection<Piece> Pieces { get; set; }
         public BoardState BoardLogic { get; set; }
 
-
+        public ObservableCollection<HighlightSpot> ValidMoves { get; set; } = new ObservableCollection<HighlightSpot>();
         public ObservableCollection<Piece> CapturedRedPieces { get; set; } = new ObservableCollection<Piece>();
         public ObservableCollection<Piece> CapturedBlackPieces { get; set; } = new ObservableCollection<Piece>();
 
@@ -40,6 +40,7 @@ namespace Chinese_Chess.ViewModels
             Pieces.Clear();
             CapturedRedPieces.Clear();
             CapturedBlackPieces.Clear();
+            ValidMoves.Clear();
             GameStatus = "Đỏ đi trước";
 
             InitStandardBoard();
@@ -97,7 +98,8 @@ namespace Chinese_Chess.ViewModels
             {
                 if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
                 {
-                    SelectPiece(clickedPiece); 
+                    SelectPiece(clickedPiece);
+                    ShowValidMoves(_selectedPiece);
                 }
                 return;
             }
@@ -109,6 +111,7 @@ namespace Chinese_Chess.ViewModels
             if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
             {
                 SelectPiece(clickedPiece);
+                ShowValidMoves(_selectedPiece);
                 return;
             }
             var move = new Move(_selectedPiece, _selectedPiece.X, _selectedPiece.Y, x, y);
@@ -132,6 +135,17 @@ namespace Chinese_Chess.ViewModels
                 ClearSelection();
             }
         }
+        private void ShowValidMoves(Piece p)
+        {
+            ValidMoves.Clear();
+            // Lấy tất cả nước đi an toàn của quân này
+            var moves = MoveValidator.GetSafeMoves(BoardLogic, p);
+
+            foreach (var m in moves)
+            {
+                ValidMoves.Add(new HighlightSpot { X = m.x, Y = m.y });
+            }
+        }
         private void SelectPiece(Piece p)
         {
             if (_selectedPiece != null) _selectedPiece.IsSelected = false;
@@ -143,6 +157,7 @@ namespace Chinese_Chess.ViewModels
         {
             if (_selectedPiece != null) _selectedPiece.IsSelected = false;
             _selectedPiece = null;
+            ValidMoves.Clear();
         }
 
         private void ExecuteMove(Move move, Piece target)
