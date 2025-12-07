@@ -57,7 +57,7 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Ellipse Width="55" Height="55" Stroke="Yellow" StrokeThickness="3" 
-                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
                                                 Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="5"/>
@@ -66,6 +66,32 @@
 
                                         <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"
                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl ItemsSource="{Binding ValidMoves}" Width="600" Height="640" IsHitTestVisible="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X, Converter={StaticResource PosConverter}, ConverterParameter=X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y, Converter={StaticResource PosConverter}, ConverterParameter=Y}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Width="60" Height="60" Margin="-5,-5,0,0">
+                                        <Ellipse Width="30" Height="30" Fill="#BF94E4" Opacity="0.4" 
+                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Ellipse.Effect>
+                                                <BlurEffect Radius="8"/>
+                                            </Ellipse.Effect>
+                                        </Ellipse>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
