@@ -25,5 +25,15 @@ namespace Chinese_Chess.Views
                 mainWindow.Content = gameScreen;
             }
         }
+
+        private void BackToMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            Window mainWindow = Window.GetWindow(this);
+            MainMenuView mainMenuScreen = new MainMenuView();
+            if (mainWindow != null)
+            {
+                mainWindow.Content = mainMenuScreen;
+            }
+        }
     }
 }

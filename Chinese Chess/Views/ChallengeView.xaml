@@ -53,24 +53,81 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DifficultyCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource Black5Brush}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="15"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect ShadowDepth="1" BlurRadius="3" Color="Black" Opacity="0.1"/>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+		<Style x:Key="DifficultyRadioStyle" TargetType="RadioButton">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="2"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="Margin" Value="0,0,0,15"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="GroupName" Value="DifficultyGroup"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="RadioButton">
+						<Border x:Name="OuterBorder"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="8"
+								Padding="{TemplateBinding Padding}">
+							<Border.Effect>
+								<DropShadowEffect ShadowDepth="1" BlurRadius="3" Color="Black" Opacity="0.1"/>
+							</Border.Effect>
+
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+
+									<ColumnDefinition Width="Auto"/>
+
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<ContentPresenter Grid.Column="0" VerticalAlignment="Center"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{TemplateBinding Tag}"
+										   FontSize="24"
+										   Foreground="{StaticResource PrimaryBrush}"
+										   VerticalAlignment="Center"
+										   Margin="10,0,15,0"/>
+
+								<Border x:Name="CheckSquare"
+										Grid.Column="2"
+										Width="24" Height="24"
+										BorderBrush="{StaticResource PrimaryBrush}"
+										BorderThickness="1"
+										CornerRadius="4"
+										Background="Transparent"
+										VerticalAlignment="Center">
+
+									<TextBlock x:Name="CheckMark"
+											   Text="✓"
+											   FontSize="18" FontWeight="Bold"
+											   Foreground="{StaticResource TextDarkBrush}"
+											   HorizontalAlignment="Center" VerticalAlignment="Center"
+											   Visibility="Collapsed"/>
+								</Border>
+							</Grid>
+						</Border>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+							</Trigger>
+
+							<Trigger Property="IsChecked" Value="True">
+								<Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+								<Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource Primary10Brush}"/>
+
+								<Setter TargetName="CheckSquare" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+								<Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
     </UserControl.Resources>
 
@@ -79,12 +136,33 @@
 
         <Border Background="{StaticResource BackgroundDarkBrush}" Opacity="0.9"/>
 
-        <Button Content="✕" 
-                FontSize="36" 
-                Foreground="{StaticResource TextDarkBrush}"
-                HorizontalAlignment="Right" VerticalAlignment="Top" 
-                Margin="20" Background="Transparent" BorderThickness="0"
-                Cursor="Hand" Panel.ZIndex="2"/>
+		<Button Content="Back to Menu"
+                FontSize="16" FontWeight="SemiBold"
+                Foreground="{StaticResource PrimaryBrush}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="20" Cursor="Hand" Panel.ZIndex="2"
+                Click="BackToMenuButton_Click">
+
+			<Button.Template>
+				<ControlTemplate TargetType="Button">
+					<Border x:Name="border"
+							Background="Transparent"
+							BorderBrush="{StaticResource PrimaryBrush}"
+							BorderThickness="1"
+							CornerRadius="20"
+							Padding="20,10">
+						<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+					</Border>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+							<Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Button.Template>
+		</Button>
 
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="1200" Margin="20" Panel.ZIndex="1">
             <Grid.RowDefinitions>
@@ -94,7 +172,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Margin="0,0,0,50">
-                <TextBlock Text="Choose your Challenge"
+                <TextBlock Text="Select Game Mode"
                            FontSize="60" 
                            FontWeight="Black" 
                            Foreground="{StaticResource TextDarkBrush}" 
@@ -105,7 +183,7 @@
                         <DropShadowEffect ShadowDepth="2" BlurRadius="0" Color="#e6d5b8" Direction="135" Opacity="1"/>
                     </TextBlock.Effect>
                 </TextBlock>
-                <TextBlock Text="Select an opponent to begin the match."
+                <TextBlock Text="Select an opponent type to begin the battle."
                            FontSize="20" 
                            Foreground="{StaticResource TextDarkBrush}" 
                            Opacity="0.8"
@@ -119,65 +197,34 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" 
-                        Background="{StaticResource SurfaceDarkBrush}" 
-                        BorderBrush="{StaticResource BorderDarkBrush}" 
-                        BorderThickness="2" 
-                        CornerRadius="8" 
+				<Border Grid.Column="0"
+                        Background="{StaticResource SurfaceDarkBrush}"
+                        BorderBrush="{StaticResource BorderDarkBrush}"
+                        BorderThickness="2"
+                        CornerRadius="8"
                         Padding="30"
                         VerticalAlignment="Top">
 
-                    <StackPanel x:Name="DifficultyOptions" Margin="0,0,0,0">
-                        <Border Style="{StaticResource DifficultyCardStyle}" Margin="0,0,0,15">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Easy" Style="{DynamicResource Heading3}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
-                                    <TextBlock Text="Perfect for beginners." Foreground="{StaticResource TextDarkBrush}" Opacity="0.8"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="" FontSize="30" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
+					<StackPanel x:Name="DifficultyOptions" Margin="0,0,0,0">
 
-                        <Border Style="{StaticResource DifficultyCardStyle}" 
-                                BorderBrush="{StaticResource PrimaryBrush}" 
-                                BorderThickness="2"
-                                Background="{StaticResource Primary10Brush}"
-                                Margin="0,0,0,15">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Medium" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
-                                    <TextBlock Text="A balanced challenge." Foreground="{StaticResource TextDarkBrush}" Opacity="0.8"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="" FontSize="30" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
+						<RadioButton Style="{StaticResource DifficultyRadioStyle}" IsChecked="True">
+							<StackPanel>
+								<TextBlock Text="Single Player" Style="{DynamicResource Heading3}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
+								<TextBlock Text="Practice against the computer." Foreground="{StaticResource TextDarkBrush}" Opacity="0.8"/>
+							</StackPanel>
+						</RadioButton>
 
-                        <Border Style="{StaticResource DifficultyCardStyle}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Hard" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
-                                    <TextBlock Text="For experienced players." Foreground="{StaticResource TextDarkBrush}" Opacity="0.8"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="" FontSize="30" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
+						<RadioButton Style="{StaticResource DifficultyRadioStyle}">
+							<StackPanel>
+								<TextBlock Text="Multiplayer" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
+								<TextBlock Text="Play with a friend." Foreground="{StaticResource TextDarkBrush}" Opacity="0.8"/>
+							</StackPanel>
+						</RadioButton>
 
-                        <Button Content="START GAME" Style="{StaticResource StartGameButtonStyle}" Margin="0,30,0,0" Click="StartGameButton_Click"/>
+						<Button Content="START GAME" Style="{StaticResource StartGameButtonStyle}" Margin="0,30,0,0" Click="StartGameButton_Click"/>
 
-                    </StackPanel>
-                </Border>
+					</StackPanel>
+				</Border>
 
                 <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="50,40,0,0">
                     <Border Width="120" Height="120" CornerRadius="60" 
@@ -188,12 +235,12 @@
                         <TextBlock Text="✨" FontSize="80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
 
-                    <TextBlock Text="Ready for a challenge?" 
+                    <TextBlock Text="Ready for a match?" 
                                FontSize="30" FontWeight="Bold" 
                                Foreground="{StaticResource TextDarkBrush}" 
                                TextAlignment="Center" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Your next move is critical. Select a difficulty level and prove your mastery of Chinese Chess."
+                    <TextBlock Text="Your next move is critical. Select an option and prove your mastery of Chinese Chess."
                                Foreground="{StaticResource TextDarkBrush}" 
                                Opacity="0.8"
                                TextAlignment="Center" 
