@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:Chinese_Chess.Views" 
         
         mc:Ignorable="d"
-        Title="Chinese Chess Master" Height="800" Width="1200"
+        Title="Chinese Chess Master" Height="700" Width="1100"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <ContentControl x:Name="MainContent">
