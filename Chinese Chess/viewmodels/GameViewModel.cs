@@ -1,11 +1,12 @@
-﻿using Chinese_Chess.Models;
-using Chinese_Chess.Helpers;
+﻿using Chinese_Chess.Helpers;
+using Chinese_Chess.Models;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows;
-using System.Collections.Generic;
 
 namespace Chinese_Chess.ViewModels
 {
@@ -127,6 +128,7 @@ namespace Chinese_Chess.ViewModels
                         CapturedBlackPieces.Add(clickedPiece);
                 }
                 BoardLogic.MovePiece(_selectedPiece, x, y);
+                AudioHelper.PlaySFX("Play.mp3"); 
                 ClearSelection();
                 CheckGameState();
             }
