@@ -77,7 +77,7 @@
     </UserControl.Resources>
 
     <Grid Background="{StaticResource BackgroundDarkBrush}">
-        <Image Source="/Assets/XiangquiBoard.png" Stretch="UniformToFill" Opacity="0.1"/>
+        <Image Source="/Assets/Background/Background.png" Stretch="UniformToFill" Opacity="1"/>
 
 		<Grid MaxWidth="1000" Margin="20">
 			<Grid.RowDefinitions>
@@ -105,7 +105,7 @@
 					</Grid.ColumnDefinitions>
 					<Separator Grid.Column="0" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
 					<TextBlock Grid.Column="1" Text="MASTER CHALLENGE"
-                               FontSize="16" Foreground="{StaticResource TextDarkBrush}"
+                               FontSize="16" Foreground="{DynamicResource PrimaryBrush}"
                                FontWeight="SemiBold" Margin="20,0"
                                Typography.Capitals="AllSmallCaps"/>
 					<Separator Grid.Column="2" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>

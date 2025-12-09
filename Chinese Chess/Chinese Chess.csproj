@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\AudioHelper.cs" />
     <Compile Include="Helpers\UIConverters.cs" />
     <Compile Include="Models\HighlightSpot.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
@@ -199,12 +200,31 @@
     <Resource Include="Assets\Button\draw10.png" />
     <Resource Include="Assets\Button\surrender10.png" />
     <Resource Include="Assets\Background\Background.png" />
-    <Content Include="Assets\Sound\1.mp3" />
-    <Content Include="Assets\Sound\2.mp3" />
-    <Content Include="Assets\Sound\3.mp3" />
-    <Content Include="Assets\Sound\4.mp3" />
-    <Content Include="Assets\Sound\Special.mp3" />
-    <Content Include="Assets\Sound\TriNga~.mp3" />
+    <Resource Include="Assets\Button\play.png" />
+    <Content Include="Assets\Sound\1.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\2.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\3.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\4.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\ButtonClick.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\Play.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\Special.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sound\TriNga~.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

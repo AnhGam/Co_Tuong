@@ -11,7 +11,6 @@ namespace Chinese_Chess.Views
 {
     public partial class GameView : UserControl
     {
-        // Timer đếm giờ
         DispatcherTimer gameTimer;
         int timeInSeconds = 0;
         bool isPaused = false;
@@ -21,30 +20,22 @@ namespace Chinese_Chess.Views
         {
             InitializeComponent();
 
-            // 1. KẾT NỐI VIEWMODEL (QUAN TRỌNG)
-            // Code này sẽ kích hoạt logic khởi tạo bàn cờ trong GameViewModel
+            // 1. KẾT NỐI VIEWMODEL 
             var viewModel = new GameViewModel();
             this.DataContext = viewModel;
 
-            // 2. KHỞI ĐỘNG ĐỒNG HỒ
             SetupTimer();
+            AudioHelper.PlayBGM("Special.mp3");
         }
 
-        // --- XỬ LÝ CLICK BÀN CỜ (Đã sửa lỗi không tìm thấy BoardCanvas) ---
         private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // SỬA LỖI: Lấy Canvas từ 'sender' thay vì gọi tên trực tiếp
+            if (isPaused) return;
             var canvas = sender as Canvas;
             if (canvas == null) return;
-
-            // 1. Lấy vị trí chuột trên Canvas
             var point = e.GetPosition(canvas);
-
-            // 2. Tính toán tọa độ Cờ (Row/Col) dùng Helper
-            // (Hàm này bạn đã có trong CoordinateHelper)
             var (col, row) = CoordinateHelper.GetExactCoordinate(point.X, point.Y);
 
-            // 3. Nếu click hợp lệ (col != -1), gửi lệnh sang ViewModel
             if (col != -1 && row != -1)
             {
                 if (this.DataContext is GameViewModel vm)
@@ -54,7 +45,6 @@ namespace Chinese_Chess.Views
             }
         }
 
-        // --- CÁC HÀM HỖ TRỢ (TIMER & BUTTON) ---
 
         void SetupTimer()
         {
@@ -83,6 +73,25 @@ namespace Chinese_Chess.Views
         private void Pause_Click(object sender, RoutedEventArgs e)
         {
             isPaused = !isPaused;
+            AudioHelper.PauseBGM(isPaused);
+            if (isPaused)
+            {
+                gameTimer.Stop();
+                try
+                {
+                    Pause_icon.Source = new BitmapImage(new Uri("/Assets/Button/play.png", UriKind.Relative));
+                }
+                catch { }
+            }
+            else
+            {
+                gameTimer.Start();
+                try
+                {
+                    Pause_icon.Source = new BitmapImage(new Uri("/Assets/Button/pause1.png", UriKind.Relative));
+                }
+                catch { }
+            }
         }
 
         private void New_Game_Click(object sender, RoutedEventArgs e)
@@ -98,6 +107,7 @@ namespace Chinese_Chess.Views
         private void MuteButton_Click(object sender, RoutedEventArgs e)
         {
             isMuted = !isMuted;
+            AudioHelper.ToggleMute(isMuted);
             string iconName = isMuted ? "sound_off.png" : "sound_on.png";
             try
             {
