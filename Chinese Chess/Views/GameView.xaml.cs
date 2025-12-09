@@ -20,7 +20,7 @@ namespace Chinese_Chess.Views
         {
             InitializeComponent();
 
-            // 1. KẾT NỐI VIEWMODEL 
+            // KẾT NỐI VIEWMODEL 
             var viewModel = new GameViewModel();
             this.DataContext = viewModel;
 
@@ -115,6 +115,37 @@ namespace Chinese_Chess.Views
                 SoundIcon.Source = new BitmapImage(uri);
             }
             catch { }
+        }
+
+        private void GoBack_Click(object sender, RoutedEventArgs e)
+        {
+
+            bool wasPaused = isPaused; 
+            isPaused = true;
+            gameTimer.Stop();
+            // (éo biết bị gì những cần đưa vào title và message ngược nhau mới đúng)
+            bool result = MessageBox.Show(
+                "Mọi tiến độ trong trò chơi sẽ được lưu vào lần chơi kế tiếp.",
+                "Thoát ra màn hình chính?",
+                "Đồng ý",
+                "Hủy");
+
+            if (result) 
+            {
+                Window mainWindow = Window.GetWindow(this);
+                if (mainWindow != null)
+                {
+                    mainWindow.Content = new MainMenuView();
+                }
+            }
+            else 
+            {
+                if (!wasPaused)
+                {
+                    isPaused = false;
+                    gameTimer.Start();
+                }
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
