@@ -22,6 +22,12 @@
                 <ColumnDefinition Width="670"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <Button x:Name="GoBackButton" Grid.Row="0" 
+                    HorizontalAlignment="Left" Width="35" Height="31"
+                    Background="Transparent" BorderThickness="0" 
+                    Cursor="Hand" Click="GoBack_Click" ToolTip="Về màn hình chính" VerticalAlignment="Top">
+                <Image Source="/Assets/Button/GoBack.png" Stretch="Fill"/>
+            </Button>
 
             <Grid x:Name="BoardLayout" Grid.Column="0">
                 <Grid.RowDefinitions>
@@ -34,6 +40,7 @@
                        FontSize="20" FontWeight="Bold" 
                        HorizontalAlignment="Center" VerticalAlignment="Top"
                        Margin="0,0,0,0"/>
+
 
                 <Viewbox Grid.Row="1" Stretch="Uniform" Margin="0,5">
                     <Grid Width="600" Height="640">
