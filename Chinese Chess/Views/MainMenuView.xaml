@@ -116,10 +116,11 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center">
 
 				<StackPanel Width="400" VerticalAlignment="Center">
-					<Button Content="NEW GAME" Style="{StaticResource MenuButtonStyle}" Click="NewGameButton_Click"/>
                     <Button Content="PLAY ONLINE" Style="{StaticResource MenuButtonStyle}"/>
+					<Button Content="NEW GAME" Style="{StaticResource MenuButtonStyle}" Click="NewGameButton_Click"/>
+                    <Button Content="CONTINUE" Style="{StaticResource MenuButtonStyle}" Click="ContinueButton_Click"/>
                     <Button Content="SETTINGS" Style="{StaticResource MenuButtonStyle}"/>
-					<Button Content="LEAVE" Style="{StaticResource OutlineButtonStyle}"/>
+					<Button Content="LEAVE" Style="{StaticResource OutlineButtonStyle}" Click="LeaveButton_Click" />
 
 				</StackPanel>
 

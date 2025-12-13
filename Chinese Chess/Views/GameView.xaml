@@ -10,6 +10,40 @@
     <UserControl.Resources>
         <local:BoardCoordinateConverter x:Key="PosConverter"/>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
+        <Style x:Key="ModernScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="Root" Background="Transparent" SnapsToDevicePixels="True">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="ThumbBorder" 
+                                                    Background="#CCC" 
+                                                    CornerRadius="4" 
+                                                    Margin="1,0"/>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="#A1887F"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="#8D6E63"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <UserControl.Background>
@@ -284,24 +318,75 @@
                         <Border.Effect>
                             <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
                         </Border.Effect>
+
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ScrollViewer x:Name="ChatHistoryScroll" Margin="10">
-                                <StackPanel>
-                                    <TextBlock Text="System: Game started..." Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                    <TextBlock Text="System: Bot is thinking..." Foreground="Gray" TextWrapping="Wrap"/>
-                                </StackPanel>
+
+                            <ScrollViewer x:Name="ChatHistoryScroll" Margin="10" VerticalScrollBarVisibility="Auto">
+                                <ScrollViewer.Resources>
+                                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
+                                </ScrollViewer.Resources>
+                                <ItemsControl ItemsSource="{Binding ChatMessages}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,4">
+                                                <Border x:Name="Bubble" Padding="10,6" CornerRadius="8" MaxWidth="200">
+                                                    <StackPanel>
+                                                        <TextBlock x:Name="SenderName" Text="{Binding Sender}" 
+                                                        FontSize="9" Foreground="Gray" Margin="0,0,0,2" Visibility="Collapsed"/>
+
+                                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13"/>
+
+                                                        <TextBlock Text="{Binding TimeDisplay}" 
+                                                           FontSize="9" 
+                                                           Foreground="#888" 
+                                                           HorizontalAlignment="Right" 
+                                                           Margin="5,2,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="Player">
+                                                    <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Right"/>
+                                                    <Setter TargetName="Bubble" Property="Background" Value="#DCF8C6"/>
+                                                    <Setter TargetName="Bubble" Property="BorderBrush" Value="#C4E1A4"/>
+                                                    <Setter TargetName="Bubble" Property="BorderThickness" Value="1"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding Type}" Value="Bot">
+                                                    <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Left"/>
+                                                    <Setter TargetName="Bubble" Property="Background" Value="White"/>
+                                                    <Setter TargetName="Bubble" Property="BorderBrush" Value="#DDD"/>
+                                                    <Setter TargetName="Bubble" Property="BorderThickness" Value="1"/>
+                                                    <Setter TargetName="SenderName" Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding Type}" Value="System">
+                                                    <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Center"/>
+                                                    <Setter TargetName="Bubble" Property="Background" Value="Transparent"/>
+                                                    <Setter TargetName="Bubble" Property="Padding" Value="0"/>
+                                                    <Setter TargetName="Bubble" Property="TextBlock.FontStyle" Value="Italic"/>
+                                                    <Setter TargetName="Bubble" Property="TextBlock.Foreground" Value="Gray"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </ScrollViewer>
+
                             <Grid Grid.Row="1" Margin="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="ChatInputBox" Height="30" VerticalContentAlignment="Center" Background="White" BorderBrush="#CCC"/>
-                                <Button x:Name="SendButton" Grid.Column="1" Width="30" Height="30" Margin="5,0,0,0" Background="Transparent" BorderThickness="0">
+                                <TextBox x:Name="ChatInputBox" Height="30" VerticalContentAlignment="Center" Padding="5,0" 
+                                Background="White" BorderBrush="#CCC" KeyDown="ChatInputBox_KeyDown"/>
+                                <Button x:Name="SendButton" Grid.Column="1" Width="30" Height="30" Margin="5,0,0,0" 
+                                Background="Transparent" BorderThickness="0" Click="SendButton_Click" Cursor="Hand">
                                     <Image Source="/Assets/Button/send_icon.png" Stretch="Uniform"/>
                                 </Button>
                             </Grid>

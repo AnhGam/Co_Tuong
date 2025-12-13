@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Chinese_Chess.Models
@@ -29,6 +30,7 @@ namespace Chinese_Chess.Models
         public PieceType Type { get; set; }
         public PieceColor Color { get; set; }
         public string ImagePath { get; set; } = string.Empty;
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         private int _x;
         public int X
