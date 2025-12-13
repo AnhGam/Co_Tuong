@@ -153,7 +153,7 @@ namespace Chinese_Chess.Views
             MessageBox.Show("Cài đặt...");
         }
 
-        private void Backward_Click(object sender, RoutedEventArgs e) { }
-        private void Forward_Click(object sender, RoutedEventArgs e) { }
+        private void Backward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Undo(); }
+        private void Forward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Redo(); }
     }
 }

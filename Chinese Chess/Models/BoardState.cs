@@ -45,6 +45,23 @@ namespace Chinese_Chess.Models
             Moves.Clear();
             CurrentTurn = PieceColor.Red;
         }
+
+        public Move UndoLastMove()
+        {
+            if (Moves.Count == 0) return null;
+            var lastMove = Moves[Moves.Count - 1];
+            Moves.RemoveAt(Moves.Count - 1);
+
+            lastMove.MovedPiece.X = lastMove.FromX;
+            lastMove.MovedPiece.Y = lastMove.FromY;
+            if (lastMove.CapturedPiece != null)
+            {
+                lastMove.CapturedPiece.IsAlive = true;
+            }
+            CurrentTurn = CurrentTurn == PieceColor.Red ? PieceColor.Black : PieceColor.Red;
+
+            return lastMove;
+        }
     }
 }
 
