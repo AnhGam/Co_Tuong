@@ -1,5 +1,7 @@
 ﻿using Chinese_Chess.Helpers;
 using Chinese_Chess.Models;
+using Chinese_Chess.Models.Chinese_Chess.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,6 +9,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Microsoft.Win32;
+using System.IO;
+using System.Text.Json;
 
 namespace Chinese_Chess.ViewModels
 {
@@ -16,6 +21,11 @@ namespace Chinese_Chess.ViewModels
         public BoardState BoardLogic { get; set; }
 
         private Stack<Move> _redoStack = new Stack<Move>();
+
+        public int LoadedTime { get; set; } = 0;
+        public Action<int> OnGameLoaded;
+
+        public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new ObservableCollection<ChatMessage>();
         public ObservableCollection<HighlightSpot> ValidMoves { get; set; } = new ObservableCollection<HighlightSpot>();
         public ObservableCollection<Piece> CapturedRedPieces { get; set; } = new ObservableCollection<Piece>();
         public ObservableCollection<Piece> CapturedBlackPieces { get; set; } = new ObservableCollection<Piece>();
@@ -34,6 +44,7 @@ namespace Chinese_Chess.ViewModels
             BoardLogic = new BoardState();
             Pieces = new ObservableCollection<Piece>();
             StartNewGame();
+            AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
 
         public void StartNewGame()
@@ -132,6 +143,8 @@ namespace Chinese_Chess.ViewModels
                 BoardLogic.MovePiece(_selectedPiece, x, y);
                 AudioHelper.PlaySFX("Play.mp3");
                 _redoStack.Clear();
+                //string actionInfo = (clickedPiece != null)? $"ăn {clickedPiece.Type}" : $"đi đến ({x},{y})";
+                //AddToChat($"{_selectedPiece.Color} {_selectedPiece.Type} {actionInfo}", MessageType.System);
                 ClearSelection();
                 CheckGameState();
             }
@@ -191,6 +204,7 @@ namespace Chinese_Chess.ViewModels
             {
                 string winner = (nextTurn == PieceColor.Red ? "ĐEN" : "ĐỎ");
                 GameStatus = $"HẾT CỜ! {winner} THẮNG";
+                AddToChat($"KẾT THÚC: {winner} CHIẾN THẮNG!", MessageType.System);
                 MessageBox.Show(GameStatus);
                 return;
             }
@@ -242,6 +256,204 @@ namespace Chinese_Chess.ViewModels
             }
 
             BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+
+            CheckGameState();
+        }
+
+        public void AddToChat(string text, MessageType type, string sender = "System")
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                ChatMessages.Add(new ChatMessage
+                {
+                    Time = DateTime.Now,
+                    Sender = sender,
+                    Text = text,
+                    Type = type
+                });
+            });
+        }
+
+
+        private const string AutoSaveFile = "autosave.json";
+        public void SaveGame(int currentTimeSeconds, string filePath = null)
+        {
+
+
+            var saveData = new GameSaveData
+            {
+                GameTimeSeconds = currentTimeSeconds,
+                CurrentTurn = BoardLogic.CurrentTurn.ToString(),
+                ChatHistory = new List<ChatMessage>(ChatMessages)
+            };
+
+
+            foreach (var p in BoardLogic.Pieces)
+            {
+                saveData.AllPieces.Add(new PieceRecord
+                {
+                    Id = p.Id,
+                    Type = p.Type,
+                    Color = p.Color,
+                    X = p.X,
+                    Y = p.Y,
+                    IsAlive = p.IsAlive,
+                    ImagePath = p.ImagePath
+                });
+            }
+
+
+            foreach (var m in BoardLogic.Moves)
+            {
+                saveData.MoveHistory.Add(ConvertToRecord(m));
+            }
+
+
+            foreach (var m in _redoStack)
+            {
+                saveData.RedoStack.Add(ConvertToRecord(m));
+            }
+
+            string jsonString = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = true });
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                File.WriteAllText(filePath, jsonString);
+            }
+            else
+            {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.Filter = "Chinese Chess Save (*.json)|*.json";
+                if (dialog.ShowDialog() == true)
+                {
+                    File.WriteAllText(dialog.FileName, jsonString);
+                    MessageBox.Show("Đã lưu game thành công!", "THÔNG BÁO");
+                }
+            }
+        }
+
+        public bool LoadGame(string filePath = null)
+        {
+            string content = "";
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                if (!File.Exists(filePath)) return false;
+                content = File.ReadAllText(filePath);
+            }
+            else
+            {
+                // Load thủ công
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Filter = "Chinese Chess Save (*.json)|*.json";
+                if (dialog.ShowDialog() == true)
+                {
+                    content = File.ReadAllText(dialog.FileName);
+                }
+                else return false; 
+            }
+
+            try
+            {
+                var saveData = JsonSerializer.Deserialize<GameSaveData>(content);
+                RestoreGameFromData(saveData); 
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Hàm hỗ trợ: Chuyển Move object thành MoveRecord (để lưu)
+        private MoveRecord ConvertToRecord(Move m)
+        {
+            return new MoveRecord
+            {
+                PieceId = m.MovedPiece.Id,
+                CapturedPieceId = m.CapturedPiece?.Id, // Có thể null
+                FromX = m.FromX,
+                FromY = m.FromY,
+                ToX = m.ToX,
+                ToY = m.ToY
+            };
+        }
+
+        // Hàm hỗ trợ: Khôi phục game từ dữ liệu Save
+        private void RestoreGameFromData(GameSaveData data)
+        {
+            Pieces.Clear();
+            CapturedRedPieces.Clear();
+            CapturedBlackPieces.Clear();
+            BoardLogic.Reset();
+            _redoStack.Clear();
+            ChatMessages.Clear();
+
+            // 2. Khôi phục Chat
+            foreach (var chat in data.ChatHistory) ChatMessages.Add(chat);
+
+            // 3. Khôi phục Quân cờ
+            var restoredPieces = new List<Piece>();
+            foreach (var rec in data.AllPieces)
+            {
+                var p = new Piece
+                {
+                    Id = rec.Id, 
+                    Type = rec.Type,
+                    Color = rec.Color,
+                    X = rec.X,
+                    Y = rec.Y,
+                    IsAlive = rec.IsAlive,
+                    ImagePath = rec.ImagePath
+                };
+
+                restoredPieces.Add(p);
+                Pieces.Add(p); 
+
+                
+                if (!p.IsAlive)
+                {
+                    if (p.Color == PieceColor.Black) CapturedRedPieces.Add(p);
+                    else CapturedBlackPieces.Add(p);
+                }
+            }
+            BoardLogic.Pieces = restoredPieces; 
+
+            // 4. Khôi phục Lượt đi
+            BoardLogic.CurrentTurn = (PieceColor)Enum.Parse(typeof(PieceColor), data.CurrentTurn);
+
+            // 5. Khôi phục Lịch sử Moves
+            
+            foreach (var rec in data.MoveHistory)
+            {
+                var movedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
+                var capturedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
+
+                if (movedPiece != null)
+                {
+                    var move = new Move(movedPiece, rec.FromX, rec.FromY, rec.ToX, rec.ToY, capturedPiece);
+                    BoardLogic.Moves.Add(move);
+                }
+            }
+
+            // 6. Khôi phục Redo Stack 
+            var redoList = new List<Move>();
+            foreach (var rec in data.RedoStack)
+            {
+                var movedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
+                var capturedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
+                if (movedPiece != null)
+                {
+                    redoList.Add(new Move(movedPiece, rec.FromX, rec.FromY, rec.ToX, rec.ToY, capturedPiece));
+                }
+            }
+            // Đẩy vào stack 
+            for (int i = redoList.Count - 1; i >= 0; i--)
+            {
+                _redoStack.Push(redoList[i]);
+            }
+            LoadedTime = data.GameTimeSeconds;
+            OnGameLoaded?.Invoke(LoadedTime);
 
             CheckGameState();
         }

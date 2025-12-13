@@ -1,4 +1,5 @@
 ﻿using Chinese_Chess.Helpers;
+using Chinese_Chess.Models.Chinese_Chess.Models;
 using Chinese_Chess.ViewModels;
 using System;
 using System.Windows;
@@ -23,10 +24,53 @@ namespace Chinese_Chess.Views
             // KẾT NỐI VIEWMODEL 
             var viewModel = new GameViewModel();
             this.DataContext = viewModel;
-
+            viewModel.OnGameLoaded += (savedTime) =>
+            {
+                timeInSeconds = savedTime;
+                TimeSpan time = TimeSpan.FromSeconds(timeInSeconds);
+                if (GameTimerLabel != null)
+                    GameTimerLabel.Content = time.ToString(@"mm\:ss");
+            };
+            viewModel.ChatMessages.CollectionChanged += (s, e) =>
+            {
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    Dispatcher.InvokeAsync(() => ChatHistoryScroll.ScrollToBottom());
+                }
+            };
             SetupTimer();
             AudioHelper.PlayBGM("Special.mp3");
+            this.Loaded += GameView_Loaded;
+            this.Unloaded += GameView_Unloaded;
         }
+
+        // Khi bắt đầu game -> theo dõi nút thoát
+        private void GameView_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window window = Window.GetWindow(this);
+            if (window != null)
+            {
+                window.Closing += OnWindowClosing;
+            }
+        }
+
+        // Khi thoát ra -> Ngừng theo dõi 
+        private void GameView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Window window = Window.GetWindow(this);
+            if (window != null)
+            {
+                window.Closing -= OnWindowClosing;
+            }
+        }
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.SaveGame(timeInSeconds, "autosave.json");
+            }
+        }
+
 
         private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -132,6 +176,11 @@ namespace Chinese_Chess.Views
 
             if (result) 
             {
+                if (this.DataContext is GameViewModel vm)
+                {
+                    vm.SaveGame(timeInSeconds, "autosave.json");
+                }
+
                 Window mainWindow = Window.GetWindow(this);
                 if (mainWindow != null)
                 {
@@ -155,5 +204,27 @@ namespace Chinese_Chess.Views
 
         private void Backward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Undo(); }
         private void Forward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Redo(); }
+        private void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            SendMessage();
+        }
+        private void ChatInputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) SendMessage();
+        }
+
+        private void SendMessage()
+        {
+            string msg = ChatInputBox.Text.Trim();
+            if (string.IsNullOrEmpty(msg)) return;
+
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.AddToChat(msg, MessageType.Player, "Me");
+            }
+
+            ChatInputBox.Text = "";
+            ChatInputBox.Focus();
+        }
     }
 }
