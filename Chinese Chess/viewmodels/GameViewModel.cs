@@ -15,6 +15,7 @@ namespace Chinese_Chess.ViewModels
         public ObservableCollection<Piece> Pieces { get; set; }
         public BoardState BoardLogic { get; set; }
 
+        private Stack<Move> _redoStack = new Stack<Move>();
         public ObservableCollection<HighlightSpot> ValidMoves { get; set; } = new ObservableCollection<HighlightSpot>();
         public ObservableCollection<Piece> CapturedRedPieces { get; set; } = new ObservableCollection<Piece>();
         public ObservableCollection<Piece> CapturedBlackPieces { get; set; } = new ObservableCollection<Piece>();
@@ -42,6 +43,7 @@ namespace Chinese_Chess.ViewModels
             CapturedRedPieces.Clear();
             CapturedBlackPieces.Clear();
             ValidMoves.Clear();
+            _redoStack.Clear();
             GameStatus = "Đỏ đi trước";
 
             InitStandardBoard();
@@ -128,7 +130,8 @@ namespace Chinese_Chess.ViewModels
                         CapturedBlackPieces.Add(clickedPiece);
                 }
                 BoardLogic.MovePiece(_selectedPiece, x, y);
-                AudioHelper.PlaySFX("Play.mp3"); 
+                AudioHelper.PlaySFX("Play.mp3");
+                _redoStack.Clear();
                 ClearSelection();
                 CheckGameState();
             }
@@ -201,6 +204,46 @@ namespace Chinese_Chess.ViewModels
             {
                 GameStatus = nextTurn == PieceColor.Red ? "Lượt Đỏ" : "Lượt Đen";
             }
+        }
+
+        public void Undo()
+        {
+            var move = BoardLogic.UndoLastMove();
+            if (move == null) return; 
+
+            if (move.CapturedPiece != null)
+            {
+                if (move.CapturedPiece.Color == PieceColor.Black)
+                    CapturedRedPieces.Remove(move.CapturedPiece);
+                else
+                    CapturedBlackPieces.Remove(move.CapturedPiece);
+            }
+
+            _redoStack.Push(move);
+
+            _selectedPiece = null;
+            ValidMoves.Clear();
+            CheckGameState(); 
+        }
+
+        public void Redo()
+        {
+            if (_redoStack.Count == 0) return;
+
+            var move = _redoStack.Pop();
+
+            var target = BoardLogic.GetPieceAt(move.ToX, move.ToY);
+
+            if (target != null)
+            {
+                target.IsAlive = false;
+                if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
+                else CapturedBlackPieces.Add(target);
+            }
+
+            BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+
+            CheckGameState();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
