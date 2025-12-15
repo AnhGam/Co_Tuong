@@ -12,6 +12,8 @@ using System.Windows;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Chinese_Chess.Services;
 
 namespace Chinese_Chess.ViewModels
 {
@@ -43,6 +45,11 @@ namespace Chinese_Chess.ViewModels
         {
             BoardLogic = new BoardState();
             Pieces = new ObservableCollection<Piece>();
+            _botService.OnLog = (msg) =>
+            {
+                // Chỉ in ra màn hình Output của Visual Studio (View -> Output)
+                System.Diagnostics.Debug.WriteLine($"[SERVICE LOG]: {msg}");
+            };
             StartNewGame();
             AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
@@ -106,6 +113,7 @@ namespace Chinese_Chess.ViewModels
         // Xử lý Click (Logic chọn và đi)
         public void OnTileClicked(int x, int y)
         {
+            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
             var clickedPiece = BoardLogic.GetPieceAt(x, y);
 
             if (_selectedPiece == null)
@@ -132,21 +140,8 @@ namespace Chinese_Chess.ViewModels
 
             if (MoveValidator.IsValidMove(BoardLogic, move))
             {
-                if (clickedPiece != null)
-                {
-                    clickedPiece.IsAlive = false; 
-                    if (clickedPiece.Color == PieceColor.Black)
-                        CapturedRedPieces.Add(clickedPiece);   
-                    else
-                        CapturedBlackPieces.Add(clickedPiece);
-                }
-                BoardLogic.MovePiece(_selectedPiece, x, y);
-                AudioHelper.PlaySFX("Play.mp3");
-                _redoStack.Clear();
-                //string actionInfo = (clickedPiece != null)? $"ăn {clickedPiece.Type}" : $"đi đến ({x},{y})";
-                //AddToChat($"{_selectedPiece.Color} {_selectedPiece.Type} {actionInfo}", MessageType.System);
-                ClearSelection();
-                CheckGameState();
+                ExecuteMove(move, clickedPiece); 
+                TriggerBotTurn();
             }
             else
             {
@@ -180,16 +175,17 @@ namespace Chinese_Chess.ViewModels
 
         private void ExecuteMove(Move move, Piece target)
         {
-
             if (target != null)
             {
-                target.IsAlive = false; 
-
+                target.IsAlive = false;
                 if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
                 else CapturedBlackPieces.Add(target);
             }
 
             BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+            AudioHelper.PlaySFX("Play.mp3");
+
+            _redoStack.Clear();
             ClearSelection();
             CheckGameState();
         }
@@ -457,6 +453,55 @@ namespace Chinese_Chess.ViewModels
 
             CheckGameState();
         }
+
+        private EngineService _botService = new EngineService();
+        public int Difficulty { get; set; } = 1;
+
+        private async void TriggerBotTurn()
+        {
+            if (GameStatus.Contains("THẮNG")) return;
+
+            // Delay 1 giây fake
+            int delayTime = 500; 
+            if(Difficulty == 3) delayTime = 1000;
+            await Task.Delay(delayTime);
+
+            // điều chỉnh độ khó (depth = số nước nhìn trước)
+            int depth = 2;
+            switch (Difficulty)
+            {
+                case 1: depth = 2; break;
+                case 2: depth = 5; break;
+                case 3: depth = 9; break;
+            }
+            try
+            {
+                string fen = FenHelper.GetFen(BoardLogic);
+                var botMove = await _botService.GetBestMoveAsync(fen, depth);
+
+                if (botMove != null)
+                {
+                    var pieceToMove = BoardLogic.GetPieceAt(botMove.FromX, botMove.FromY);
+                    var targetPiece = BoardLogic.GetPieceAt(botMove.ToX, botMove.ToY);
+
+                    if (pieceToMove != null)
+                    {
+                        var move = new Move(pieceToMove, botMove.FromX, botMove.FromY, botMove.ToX, botMove.ToY);
+                        ExecuteMove(move, targetPiece);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Bot gặp lỗi: " + ex.Message);
+            }
+        }
+
+        public void StopGame()
+        {
+            _botService.StopEngine();
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

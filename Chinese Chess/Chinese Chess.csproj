@@ -89,10 +89,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers\AudioHelper.cs" />
+    <Compile Include="Helpers\FenHelper.cs" />
     <Compile Include="Helpers\UIConverters.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\HighlightSpot.cs" />
     <Compile Include="Models\SaveData.cs" />
+    <Compile Include="Services\EngineService.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Views\ChallengeView.xaml.cs">
       <DependentUpon>ChallengeView.xaml</DependentUpon>
@@ -156,6 +158,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Assets\Engine\AUTHORS" />
+    <None Include="Assets\Engine\CONTRIBUTING.md" />
+    <None Include="Assets\Engine\NNUE-License.md" />
+    <None Include="Assets\Engine\pikafish.nnue">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Engine\README.md" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -165,9 +174,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Assets\Button\backward1.png" />
     <Resource Include="Assets\Button\backward2.png" />
@@ -242,6 +249,11 @@
     <Resource Include="Assets\Background\Background.png" />
     <Resource Include="Assets\Button\play.png" />
     <Resource Include="Assets\Button\GoBack.png" />
+    <Resource Include="Assets\Engine\Copying.txt" />
+    <Content Include="Assets\Engine\pikafish.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Assets\Engine\Top CPU Contributors.txt" />
     <Content Include="Assets\Sound\1.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
