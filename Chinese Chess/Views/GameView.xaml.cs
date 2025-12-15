@@ -62,6 +62,10 @@ namespace Chinese_Chess.Views
             {
                 window.Closing -= OnWindowClosing;
             }
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.StopGame();
+            }
         }
         private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
