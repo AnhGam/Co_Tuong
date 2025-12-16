@@ -62,6 +62,9 @@ namespace Chinese_Chess.ViewModels
             CapturedBlackPieces.Clear();
             ValidMoves.Clear();
             _redoStack.Clear();
+
+            ChatMessages.Clear(); 
+
             GameStatus = "Đỏ đi trước";
 
             InitStandardBoard();
@@ -177,23 +180,24 @@ namespace Chinese_Chess.ViewModels
         {
             if (target != null)
             {
-                target.IsAlive = false;
+                // target.IsAlive = false;
+
                 if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
                 else CapturedBlackPieces.Add(target);
             }
-
             BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
-            AudioHelper.PlaySFX("Play.mp3");
 
+            AudioHelper.PlaySFX("Play.mp3");
             _redoStack.Clear();
             ClearSelection();
             CheckGameState();
         }
 
+        public event Action<string> OnGameEnded;
+
         private void CheckGameState()
         {
             var nextTurn = BoardLogic.CurrentTurn;
-
             bool canMove = MoveValidator.HasAnyValidMove(BoardLogic, nextTurn);
 
             if (!canMove)
@@ -201,7 +205,8 @@ namespace Chinese_Chess.ViewModels
                 string winner = (nextTurn == PieceColor.Red ? "ĐEN" : "ĐỎ");
                 GameStatus = $"HẾT CỜ! {winner} THẮNG";
                 AddToChat($"KẾT THÚC: {winner} CHIẾN THẮNG!", MessageType.System);
-                MessageBox.Show(GameStatus);
+                StopGame();
+                OnGameEnded?.Invoke(winner);
                 return;
             }
 
@@ -218,42 +223,54 @@ namespace Chinese_Chess.ViewModels
 
         public void Undo()
         {
-            var move = BoardLogic.UndoLastMove();
-            if (move == null) return; 
+            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
+            int stepsToUndo = 2;
+            if (BoardLogic.Moves.Count < 2) stepsToUndo = 1;
 
-            if (move.CapturedPiece != null)
+            for (int i = 0; i < stepsToUndo; i++)
             {
-                if (move.CapturedPiece.Color == PieceColor.Black)
-                    CapturedRedPieces.Remove(move.CapturedPiece);
-                else
-                    CapturedBlackPieces.Remove(move.CapturedPiece);
+                var move = BoardLogic.UndoLastMove();
+                if (move == null) break;
+                if (move.CapturedPiece != null)
+                {
+                    if (move.CapturedPiece.Color == PieceColor.Black)
+                        CapturedRedPieces.Remove(move.CapturedPiece);
+                    else
+                        CapturedBlackPieces.Remove(move.CapturedPiece);
+                }
+                _redoStack.Push(move);
             }
-
-            _redoStack.Push(move);
 
             _selectedPiece = null;
             ValidMoves.Clear();
-            CheckGameState(); 
+            CheckGameState();
         }
 
         public void Redo()
         {
             if (_redoStack.Count == 0) return;
 
-            var move = _redoStack.Pop();
-
-            var target = BoardLogic.GetPieceAt(move.ToX, move.ToY);
-
-            if (target != null)
+            while (_redoStack.Count > 0)
             {
-                target.IsAlive = false;
-                if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
-                else CapturedBlackPieces.Add(target);
+                var move = _redoStack.Pop();
+                var target = BoardLogic.GetPieceAt(move.ToX, move.ToY);
+                if (target != null)
+                {
+                    // target.IsAlive = false;
+                    if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
+                    else CapturedBlackPieces.Add(target);
+                }
+                BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+                if (BoardLogic.CurrentTurn == PieceColor.Red)
+                {
+                    break;
+                }
             }
-
-            BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
-
             CheckGameState();
+            if (BoardLogic.CurrentTurn == PieceColor.Black && _redoStack.Count == 0)
+            {
+                TriggerBotTurn();
+            }
         }
 
         public void AddToChat(string text, MessageType type, string sender = "System")
@@ -502,6 +519,13 @@ namespace Chinese_Chess.ViewModels
             _botService.StopEngine();
         }
 
+        public void Surrender()
+        {
+            if (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA")) return;
+            GameStatus = "ĐEN THẮNG (Đầu hàng)";
+            AddToChat("Người chơi đã đầu hàng. Bot giành chiến thắng!", MessageType.System);
+            StopGame();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
