@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Chinese_Chess.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,11 +10,23 @@ namespace Chinese_Chess.Views
         {
             InitializeComponent();
         }
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            Window mainWindow = Window.GetWindow(this);
+            int selectedDifficulty = 1; // Mặc định là Easy
 
+            if (OptionEasy.IsChecked == true) selectedDifficulty = 1;
+            else if (OptionMedium.IsChecked == true) selectedDifficulty = 2;
+            else if (OptionHard.IsChecked == true) selectedDifficulty = 3;
+
+            Window mainWindow = Window.GetWindow(this);
             GameView gameScreen = new GameView();
+
+
+            if (gameScreen.DataContext is GameViewModel vm)
+            {
+                vm.Difficulty = selectedDifficulty;
+            }
 
             if (mainWindow != null)
             {

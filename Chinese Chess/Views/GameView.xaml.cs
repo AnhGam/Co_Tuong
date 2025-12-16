@@ -16,7 +16,7 @@ namespace Chinese_Chess.Views
         int timeInSeconds = 0;
         bool isPaused = false;
         bool isMuted = false;
-
+        bool _isGameFinished = false;
         public GameView()
         {
             InitializeComponent();
@@ -26,6 +26,8 @@ namespace Chinese_Chess.Views
             this.DataContext = viewModel;
             viewModel.OnGameEnded += (winner) =>
             {
+                _isGameFinished = true;
+                ClearAutoSave();
                 string message = (winner == "ĐỎ") ? "XUẤT SẮC! Bạn đã chiến thắng Bot!" : "HẾT CỜ! Bạn đã thua cuộc.";
                 bool reviewGame = MessageBox.Show(
                     message + "\nBạn muốn làm gì tiếp theo?",
@@ -85,7 +87,7 @@ namespace Chinese_Chess.Views
         }
         private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (this.DataContext is GameViewModel vm)
+            if (!_isGameFinished && this.DataContext is GameViewModel vm)
             {
                 vm.SaveGame(timeInSeconds, "autosave.json");
             }
@@ -259,6 +261,8 @@ namespace Chinese_Chess.Views
 
             var vm = this.DataContext as GameViewModel;
             vm?.Surrender();
+            _isGameFinished = true;
+            ClearAutoSave();
             isPaused = true;
             gameTimer.Stop();
 
@@ -275,6 +279,13 @@ namespace Chinese_Chess.Views
             {
                 Window mainWindow = Window.GetWindow(this);
                 if (mainWindow != null) mainWindow.Content = new MainMenuView();
+            }
+        }
+        private void ClearAutoSave()
+        {
+            if (System.IO.File.Exists("autosave.json"))
+            {
+                System.IO.File.Delete("autosave.json");
             }
         }
     }
