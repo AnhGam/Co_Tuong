@@ -54,6 +54,23 @@ namespace Chinese_Chess.ViewModels
             AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
 
+        // 1. Khai báo biến private (lưu trữ giá trị thực)
+        private string _opponentName;
+
+        // 2. Khai báo Property public (để Binding ra ngoài)
+        public string OpponentName
+        {
+            get { return _opponentName; }
+            set
+            {
+                if (_opponentName != value)
+                {
+                    _opponentName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void StartNewGame()
         {
             BoardLogic.Reset();

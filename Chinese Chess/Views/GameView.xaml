@@ -245,8 +245,7 @@
                             </Grid.ColumnDefinitions>
                             <Image x:Name="Player1_avatar" Source="/Assets/ImagePiece/black_general.png" Width="70" Height="70" VerticalAlignment="Top"/>
                             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                <TextBlock x:Name="Player1_name" Text="Bot Hard" FontWeight="Bold" FontSize="18"/>
-                                <TextBlock x:Name="Player1_elo" Text="Elo: 2800" Foreground="Gray" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding OpponentName}" FontWeight="Bold" FontSize="18"/>
                             </StackPanel>
                             <WrapPanel x:Name="P1CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
                                 <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
@@ -297,8 +296,7 @@
                             </Grid.ColumnDefinitions>
                             <Image x:Name="Player2_avatar" Source="/Assets/ImagePiece/red_general.png" Width="70" Height="70" VerticalAlignment="Top"/>
                             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                <TextBlock x:Name="Player2_name" Text="Player 1" FontWeight="Bold" FontSize="18"/>
-                                <TextBlock x:Name="Player2_elo" Text="Elo: 1200" Foreground="Gray" Margin="0,5,0,0"/>
+                                <TextBlock x:Name="Player2_name" Text="Player" FontWeight="Bold" FontSize="18"/>
                             </StackPanel>
                             <WrapPanel x:Name="P2CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
                                 <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
