@@ -32,7 +32,9 @@ namespace Chinese_Chess.Models
     {
         public DateTime SaveDate { get; set; } = DateTime.Now;
         public int GameTimeSeconds { get; set; }
-        public string CurrentTurn { get; set; } 
+        public string CurrentTurn { get; set; }
+
+        public int Difficulty { get; set; }
 
         // Bàn cờ & Quân
         public List<PieceRecord> AllPieces { get; set; } = new List<PieceRecord>();

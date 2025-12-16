@@ -297,7 +297,9 @@ namespace Chinese_Chess.ViewModels
             {
                 GameTimeSeconds = currentTimeSeconds,
                 CurrentTurn = BoardLogic.CurrentTurn.ToString(),
+                Difficulty = this.Difficulty,
                 ChatHistory = new List<ChatMessage>(ChatMessages)
+
             };
 
 
@@ -402,6 +404,7 @@ namespace Chinese_Chess.ViewModels
             _redoStack.Clear();
             ChatMessages.Clear();
 
+            this.Difficulty = data.Difficulty;
             // 2. Khôi phục Chat
             foreach (var chat in data.ChatHistory) ChatMessages.Add(chat);
 
