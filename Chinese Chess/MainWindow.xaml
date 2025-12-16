@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         
         xmlns:views="clr-namespace:Chinese_Chess.Views" 
-        
+        Icon="/Assets/gameIcon.ico"
         mc:Ignorable="d"
         Title="Chinese Chess Master" Height="700" Width="1100"
         WindowStartupLocation="CenterScreen">
