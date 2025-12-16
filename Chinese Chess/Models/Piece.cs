@@ -26,41 +26,25 @@ namespace Chinese_Chess.Models
 
     public class Piece : INotifyPropertyChanged
     {
-        // Type và Color không đổi 
+        public string Id { get; set; } = System.Guid.NewGuid().ToString();
         public PieceType Type { get; set; }
         public PieceColor Color { get; set; }
-        public string ImagePath { get; set; } = string.Empty;
-        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         private int _x;
         public int X
         {
             get => _x;
-            set
-            {
-                if (_x != value)
-                {
-                    _x = value;
-                    OnPropertyChanged(); 
-                }
-            }
+            set { _x = value; OnPropertyChanged(); } // Cập nhật vị trí
         }
 
         private int _y;
         public int Y
         {
             get => _y;
-            set
-            {
-                if (_y != value)
-                {
-                    _y = value;
-                    OnPropertyChanged(); 
-                }
-            }
+            set { _y = value; OnPropertyChanged(); } // Cập nhật vị trí
         }
 
-        private bool _isAlive = true;
+        private bool _isAlive;
         public bool IsAlive
         {
             get => _isAlive;
@@ -69,26 +53,38 @@ namespace Chinese_Chess.Models
                 if (_isAlive != value)
                 {
                     _isAlive = value;
-                    OnPropertyChanged(); 
+                    OnPropertyChanged(); // Cập nhật sống/chết
                 }
             }
         }
+
+        public string ImagePath { get; set; }
+
         private bool _isSelected;
         public bool IsSelected
         {
             get => _isSelected;
             set { _isSelected = value; OnPropertyChanged(); }
         }
-        public Piece Clone()
-        {
-            return (Piece)this.MemberwiseClone();
-        }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public Piece Clone()
+        {
+            return new Piece
+            {
+                Id = this.Id,
+                Type = this.Type,
+                Color = this.Color,
+                X = this.X,
+                Y = this.Y,
+                IsAlive = this.IsAlive,
+                ImagePath = this.ImagePath
+            };
         }
     }
 }

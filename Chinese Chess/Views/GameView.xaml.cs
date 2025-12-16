@@ -24,6 +24,22 @@ namespace Chinese_Chess.Views
             // KẾT NỐI VIEWMODEL 
             var viewModel = new GameViewModel();
             this.DataContext = viewModel;
+            viewModel.OnGameEnded += (winner) =>
+            {
+                string message = (winner == "ĐỎ") ? "XUẤT SẮC! Bạn đã chiến thắng Bot!" : "HẾT CỜ! Bạn đã thua cuộc.";
+                bool reviewGame = MessageBox.Show(
+                    message + "\nBạn muốn làm gì tiếp theo?",
+                    "KẾT THÚC",
+                    "Xem lại ván đấu", 
+                    "Về Menu Chính");  
+
+                if (reviewGame){}
+                else
+                {
+                    Window mainWindow = Window.GetWindow(this);
+                    if (mainWindow != null) mainWindow.Content = new MainMenuView();
+                }
+            };
             viewModel.OnGameLoaded += (savedTime) =>
             {
                 timeInSeconds = savedTime;
@@ -229,6 +245,37 @@ namespace Chinese_Chess.Views
 
             ChatInputBox.Text = "";
             ChatInputBox.Focus();
+        }
+
+        private void SurrenderButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool confirmSurrender = MessageBox.Show(
+                "Bạn có chắc chắn muốn đầu hàng?",
+                "Xác nhận",
+                "Đúng vậy",
+                "Đánh tiếp");
+
+            if (!confirmSurrender) return;
+
+            var vm = this.DataContext as GameViewModel;
+            vm?.Surrender();
+            isPaused = true;
+            gameTimer.Stop();
+
+            bool reviewGame = MessageBox.Show(
+                "Bạn đã đầu hàng! Bạn muốn làm gì?",
+                "KẾT THÚC",
+                "Xem lại ván đấu",
+                "Về Menu Chính");
+
+            if (reviewGame)
+            {
+            }
+            else
+            {
+                Window mainWindow = Window.GetWindow(this);
+                if (mainWindow != null) mainWindow.Content = new MainMenuView();
+            }
         }
     }
 }

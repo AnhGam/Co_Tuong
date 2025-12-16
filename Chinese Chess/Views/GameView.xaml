@@ -80,6 +80,7 @@
                     <Grid Width="600" Height="640">
                         <Image x:Name="BoardImage" Source="/Assets/XiangquiBoard.png" Stretch="Fill"/>
                         <ItemsControl ItemsSource="{Binding Pieces}" Width="600" Height="640">
+                            
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas x:Name="BoardCanvas" Background="Transparent" MouseDown="BoardCanvas_MouseDown"/>
@@ -90,27 +91,28 @@
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="Canvas.Left" Value="{Binding X, Converter={StaticResource PosConverter}, ConverterParameter=X}"/>
                                     <Setter Property="Canvas.Top" Value="{Binding Y, Converter={StaticResource PosConverter}, ConverterParameter=Y}"/>
-
-                                    <Setter Property="Visibility" Value="{Binding IsAlive, Converter={StaticResource VisConverter}}"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
+
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Visibility="{Binding IsAlive, Converter={StaticResource VisConverter}}">
+
                                         <Ellipse Width="55" Height="55" Stroke="Yellow" StrokeThickness="3" 
                                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
-                                                Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
+                                            Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="5"/>
                                             </Ellipse.Effect>
                                         </Ellipse>
 
                                         <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        
 
                         <ItemsControl ItemsSource="{Binding ValidMoves}" Width="600" Height="640" IsHitTestVisible="False">
                             <ItemsControl.ItemsPanel>
@@ -176,14 +178,16 @@
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="Draw_offer" Background="Transparent" BorderThickness="0">
+                    <Button x:Name="Draw_offer" Background="Transparent" BorderThickness="0" 
+                            IsEnabled="False" Opacity="0.5" 
+                            ToolTip="Bot chưa được cài đặt tính năng cầu hòa">
                         <StackPanel>
                             <Image Source="/Assets/Button/draw10.png" Height="30" HorizontalAlignment="Center"/>
                             <TextBlock Text="Cầu hòa" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="Surrender" Background="Transparent" BorderThickness="0">
+                    <Button x:Name="Surrender" Background="Transparent" BorderThickness="0" Click="SurrenderButton_Click">
                         <StackPanel>
                             <Image Source="/Assets/Button/surrender10.png" Height="30" HorizontalAlignment="Center"/>
                             <TextBlock Text="Đầu hàng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
