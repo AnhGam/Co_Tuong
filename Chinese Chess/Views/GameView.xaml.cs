@@ -1,4 +1,5 @@
 ﻿using Chinese_Chess.Helpers;
+using Chinese_Chess.Models;
 using Chinese_Chess.Models.Chinese_Chess.Models;
 using Chinese_Chess.ViewModels;
 using System;
@@ -56,6 +57,8 @@ namespace Chinese_Chess.Views
                     Dispatcher.InvokeAsync(() => ChatHistoryScroll.ScrollToBottom());
                 }
             };
+            AppSettings.OnSettingsChanged += OnAppSettingsChanged;
+            UpdateGameAppearance();
             SetupTimer();
             AudioHelper.PlayBGM("Special.mp3");
             this.Loaded += GameView_Loaded;
@@ -84,6 +87,28 @@ namespace Chinese_Chess.Views
             {
                 vm.StopGame();
             }
+            AppSettings.OnSettingsChanged -= OnAppSettingsChanged;
+        }
+
+        private void OnAppSettingsChanged()
+        {
+            UpdateGameAppearance();
+
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.RefreshPieceImages();
+            }
+        }
+        private void UpdateGameAppearance()
+        {
+            try
+            {
+                var brush = new System.Windows.Media.ImageBrush();
+                brush.ImageSource = new BitmapImage(new Uri(AppSettings.CurrentBoardBackground, UriKind.RelativeOrAbsolute));
+                brush.Stretch = System.Windows.Media.Stretch.UniformToFill;
+                this.Background = brush;
+            }
+            catch { }
         }
         private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {

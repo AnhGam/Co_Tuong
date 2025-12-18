@@ -120,14 +120,40 @@ namespace Chinese_Chess.ViewModels
             for (int i = 0; i <= 8; i += 2) AddPiece(PieceType.Soldier, PieceColor.Red, i, 6);
         }
 
+        // Trong GameViewModel.cs
+
+
         private void AddPiece(PieceType type, PieceColor color, int x, int y)
         {
-            string imgName = $"{color.ToString().ToLower()}_{type.ToString().ToLower()}_text.png";
-            Pieces.Add(new Piece 
-            { 
-                Type = type, Color = color, X = x, Y = y, 
-                ImagePath = $"/Assets/TextPiece/{imgName}", IsAlive = true 
+            string suffix = AppSettings.PieceStyleSuffix;
+
+            // Tạo tên file
+            string imgName = $"{color.ToString().ToLower()}_{type.ToString().ToLower()}{suffix}.png";
+            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
+
+            Pieces.Add(new Piece
+            {
+                Type = type,
+                Color = color,
+                X = x,
+                Y = y,
+
+                ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}",
+                IsAlive = true
             });
+        }
+
+        public void RefreshPieceImages()
+        {
+            string suffix = AppSettings.PieceStyleSuffix;
+            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
+
+            foreach (var p in Pieces)
+            {
+                string imgName = $"{p.Color.ToString().ToLower()}_{p.Type.ToString().ToLower()}{suffix}.png";
+
+                p.ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}";
+            }
         }
 
         // Xử lý Click (Logic chọn và đi)
