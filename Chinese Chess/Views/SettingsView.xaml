@@ -4,21 +4,123 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="900" d:DesignWidth="800"
-             FontFamily="Segoe UI">
+             d:DesignHeight="800" d:DesignWidth="900"
+             FontFamily="Georgia">
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="PrimaryBrush" Color="#b99556"/>
-        <SolidColorBrush x:Key="BackgroundDarkBrush" Color="#121212"/>
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#1c1c1c"/>
-        <SolidColorBrush x:Key="TextLightBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextGrayBrush" Color="#A0A0A0"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#b99556" Opacity="0.5"/>
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#FDF8F0"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextDarkBrush" Color="#4E342E"/>
+        <SolidColorBrush x:Key="TextGrayBrush" Color="#8D6E63"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D7CCC8"/>
+
+        <Style x:Key="MinimalScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border Background="{StaticResource PrimaryBrush}" CornerRadius="2.5"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Width" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true" Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsEnabled}">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Opacity="0" Focusable="false"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Opacity="0" Focusable="false"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource MinimalScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Slider">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <Border Name="TrackBackground" Height="4" Background="#E0E0E0" CornerRadius="2" VerticalAlignment="Center"/>
+
+                            <Canvas VerticalAlignment="Center" Height="4">
+                                <Border Name="PART_SelectionRange" Height="4" Background="{StaticResource PrimaryBrush}" CornerRadius="2" Visibility="Hidden"/>
+                            </Canvas>
+
+                            <Track Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge" Opacity="0"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge" Opacity="0"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid>
+                                                    <Ellipse Width="18" Height="18" Fill="{StaticResource PrimaryBrush}" Stroke="White" StrokeThickness="2">
+                                                        <Ellipse.Effect>
+                                                            <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.3"/>
+                                                        </Ellipse.Effect>
+                                                    </Ellipse>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="15,6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bdr" Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bdr" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextLightBrush}"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
             <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
 
@@ -26,7 +128,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="Opacity" Value="0.3"/>
-            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="Margin" Value="0,0,0,25"/>
         </Style>
 
         <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
@@ -35,16 +137,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
                         <Grid Width="50" Height="26">
-                            <Border x:Name="Border" 
-                                    Background="#4a4a4a" 
-                                    CornerRadius="13"/>
-                            <Ellipse x:Name="Dot" 
-                                     Fill="White" 
-                                     Width="20" Height="20" 
-                                     HorizontalAlignment="Left" 
-                                     Margin="3,0,0,0">
+                            <Border x:Name="Border" Background="#D7CCC8" CornerRadius="13"/>
+                            <Ellipse x:Name="Dot" Fill="White" Width="20" Height="20" HorizontalAlignment="Left" Margin="3,0,0,0">
                                 <Ellipse.Effect>
-                                    <DropShadowEffect ShadowDepth="1" Opacity="0.3"/>
+                                    <DropShadowEffect ShadowDepth="1" Opacity="0.2"/>
                                 </Ellipse.Effect>
                             </Ellipse>
                         </Grid>
@@ -53,53 +149,6 @@
                                 <Setter TargetName="Border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
                                 <Setter TargetName="Dot" Property="HorizontalAlignment" Value="Right"/>
                                 <Setter TargetName="Dot" Property="Margin" Value="0,0,3,0"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="Slider">
-            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="IsSelectionRangeEnabled" Value="True"/>
-        </Style>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#2d2d2d"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="1" 
-                                CornerRadius="5">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="20,8"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Opacity" Value="0.9"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -117,10 +166,8 @@
                                 <Border CornerRadius="6" ClipToBounds="True" Height="100">
                                     <Image Source="{TemplateBinding Tag}" Stretch="UniformToFill"/>
                                 </Border>
-                                <Border Background="#99000000" VerticalAlignment="Bottom" Height="30" CornerRadius="0,0,6,6"
-                                        HorizontalAlignment="Stretch">
-                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" 
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                <Border Background="#CC4E342E" VerticalAlignment="Bottom" Height="30" CornerRadius="0,0,6,6">
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </Border>
                             </Grid>
                         </Border>
@@ -137,43 +184,51 @@
             </Setter>
         </Style>
 
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#FAFAFA"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="5">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource BackgroundDarkBrush}">
+    <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Settings Menu" 
-                   FontSize="36" FontWeight="Bold" 
-                   Foreground="{StaticResource TextLightBrush}"
-                   HorizontalAlignment="Center"
-                   Margin="0,30,0,30"/>
+        <TextBlock Text="Settings Menu" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}" HorizontalAlignment="Center" Margin="0,30,0,25">
+            <TextBlock.Effect>
+                <DropShadowEffect Color="#D7CCC8" BlurRadius="2" ShadowDepth="2" Opacity="0.5"/>
+            </TextBlock.Effect>
+        </TextBlock>
 
-        <Border Grid.Row="1" 
-                Background="{StaticResource CardBackgroundBrush}" 
-                BorderBrush="{StaticResource PrimaryBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                MaxWidth="900" Margin="20,0,20,40">
+        <Border Grid.Row="1" Background="{StaticResource CardBackgroundBrush}" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" CornerRadius="10" MaxWidth="900" Margin="40,0,40,40">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.5"/>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Color="Gray" Opacity="0.2"/>
             </Border.Effect>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="40">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="40" Margin="2">
                 <StackPanel>
 
                     <TextBlock Text="Sound Settings" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
-
                     <Grid Margin="0,0,0,40">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Music Volume" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <Grid>
@@ -182,11 +237,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Slider Maximum="100" Value="50" TickFrequency="1"/>
-                                <TextBlock Grid.Column="1" Text="&#xE767;" FontFamily="Segoe MDL2 Assets" 
-                                           Foreground="{StaticResource TextGrayBrush}" FontSize="20" Margin="15,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="🔊" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
-
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Sound Effects Volume" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <Grid>
@@ -195,30 +248,23 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Slider Maximum="100" Value="75" TickFrequency="1"/>
-                                <TextBlock Grid.Column="1" Text="&#xE93C;" FontFamily="Segoe MDL2 Assets" 
-                                           Foreground="{StaticResource TextGrayBrush}" FontSize="20" Margin="15,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="🎵" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
 
-
                     <TextBlock Text="Account Settings" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
-
                     <Grid Margin="0,0,0,40">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
                         <Grid Width="100" Height="100" Margin="0,0,30,0">
-                            <Ellipse Fill="#333333" Stroke="{StaticResource PrimaryBrush}" StrokeThickness="2"/>
-                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="40" 
-                                       Foreground="{StaticResource PrimaryBrush}" 
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Button Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-                                    Background="{StaticResource PrimaryBrush}" BorderThickness="0" Style="{StaticResource PrimaryButtonStyle}" Padding="0">
-                                <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" Foreground="Black" FontSize="12"/>
+                            <Ellipse Fill="#EEEEEE" Stroke="{StaticResource PrimaryBrush}" StrokeThickness="2"/>
+                            <TextBlock Text="👤" FontSize="40" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Button Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="{StaticResource PrimaryBrush}" BorderThickness="0" Style="{StaticResource PrimaryButtonStyle}" Padding="0">
+                                <TextBlock Text="⬆" Foreground="White" FontWeight="Bold" FontSize="14"/>
                                 <Button.Resources>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="15"/>
@@ -226,67 +272,51 @@
                                 </Button.Resources>
                             </Button>
                         </Grid>
-
-                        <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Text="Display Name" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,5"/>
-                                    <TextBox Text=""/>
+                                    <TextBox Text="Enter your name..."/>
                                 </StackPanel>
-
                                 <Button Grid.Column="1" Content="Save Profile" Style="{StaticResource PrimaryButtonStyle}" VerticalAlignment="Bottom"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
 
-
                     <TextBlock Text="Game Settings" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
-
                     <StackPanel Margin="0,0,0,40">
                         <TextBlock Text="Piece Style" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10" FontWeight="SemiBold"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                            <RadioButton Content="Text (Traditional)" IsChecked="True" Foreground="{StaticResource TextLightBrush}" GroupName="PieceStyle" Margin="0,0,20,0"/>
-                            <RadioButton Content="Image (Artistic)" Foreground="{StaticResource TextLightBrush}" GroupName="PieceStyle"/>
+                            <RadioButton Content="Text (Traditional)" IsChecked="True" Foreground="{StaticResource TextDarkBrush}" GroupName="PieceStyle" Margin="0,0,30,0"/>
+                            <RadioButton Content="Image (Artistic)" Foreground="{StaticResource TextDarkBrush}" GroupName="PieceStyle"/>
                         </StackPanel>
                     </StackPanel>
 
-
                     <TextBlock Text="Background" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
-
                     <UniformGrid Columns="3" Margin="0,0,0,40">
-                        <RadioButton Content="Wood" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                                     Tag="https://via.placeholder.com/300x150/5c4033/ffffff?text=Wood" IsChecked="True"/>
-
-                        <RadioButton Content="Stone" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                                     Tag="https://via.placeholder.com/300x150/555555/ffffff?text=Stone"/>
-
-                        <RadioButton Content="Minimal" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                                     Tag="https://via.placeholder.com/300x150/000000/ffffff?text=Minimal"/>
+                        <RadioButton Content="Wood" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/5c4033/ffffff?text=Wood" IsChecked="True"/>
+                        <RadioButton Content="Stone" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/555555/ffffff?text=Stone"/>
+                        <RadioButton Content="Minimal" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/000000/ffffff?text=Minimal"/>
                     </UniformGrid>
-
 
                     <TextBlock Text="Music" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
-
-                    <Grid Margin="0,0,0,40">
+                    <Grid Margin="0,0,0,20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
                         <StackPanel>
                             <TextBlock Text="Music On/Off" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <CheckBox IsChecked="True" Style="{StaticResource ToggleSwitchStyle}" HorizontalAlignment="Left"/>
                         </StackPanel>
-
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Track Selection" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <ComboBox SelectedIndex="0" Padding="10,5">
@@ -296,17 +326,6 @@
                             </ComboBox>
                         </StackPanel>
                     </Grid>
-
-
-                    <TextBlock Text="Nightmode/Dark mode" Style="{StaticResource SectionHeaderStyle}"/>
-                    <Border Style="{StaticResource SectionDividerStyle}"/>
-
-                    <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
-                        <Grid>
-                            <TextBlock Text="Nightmode" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextLightBrush}"/>
-                            <CheckBox IsChecked="True" Style="{StaticResource ToggleSwitchStyle}" HorizontalAlignment="Right"/>
-                        </Grid>
-                    </Border>
 
                 </StackPanel>
             </ScrollViewer>
