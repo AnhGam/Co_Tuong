@@ -16,8 +16,6 @@
         <SolidColorBrush x:Key="BorderBrush" Color="#D7CCC8"/>
 
         <Style x:Key="MinimalScrollBarThumb" TargetType="{x:Type Thumb}">
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="IsTabStop" Value="false"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Thumb}">
@@ -37,10 +35,10 @@
                         <Grid x:Name="Bg" SnapsToDevicePixels="true" Background="Transparent">
                             <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsEnabled}">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Opacity="0" Focusable="false"/>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Opacity="0"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Opacity="0" Focusable="false"/>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Opacity="0"/>
                                 </Track.IncreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource MinimalScrollBarThumb}"/>
@@ -59,18 +57,10 @@
                     <ControlTemplate TargetType="Slider">
                         <Grid VerticalAlignment="Center">
                             <Border Name="TrackBackground" Height="4" Background="#E0E0E0" CornerRadius="2" VerticalAlignment="Center"/>
-
                             <Canvas VerticalAlignment="Center" Height="4">
                                 <Border Name="PART_SelectionRange" Height="4" Background="{StaticResource PrimaryBrush}" CornerRadius="2" Visibility="Hidden"/>
                             </Canvas>
-
                             <Track Name="PART_Track">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="Slider.DecreaseLarge" Opacity="0"/>
-                                </Track.DecreaseRepeatButton>
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="Slider.IncreaseLarge" Opacity="0"/>
-                                </Track.IncreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb>
                                         <Thumb.Template>
@@ -92,24 +82,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Padding" Value="15,6"/>
-            <Setter Property="BorderThickness" Value="0"/>
+        
+        <Style x:Key="ImageRadioStyle" TargetType="RadioButton">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bdr" Background="{TemplateBinding Background}" CornerRadius="5">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="OuterBorder" BorderThickness="2" BorderBrush="Transparent" CornerRadius="8" Margin="5">
+                            <Grid>
+                                <Border CornerRadius="6" ClipToBounds="True" Height="100">
+                                    <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   Stretch="UniformToFill"/>
+                                </Border>
+
+                                <Border Background="#CC4E342E" VerticalAlignment="Bottom" Height="30" CornerRadius="0,0,6,6">
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                </Border>
+                            </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bdr" Property="Opacity" Value="0.9"/>
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#b9955688"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -131,70 +128,25 @@
             <Setter Property="Margin" Value="0,0,0,25"/>
         </Style>
 
-        <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="15,6"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="CheckBox">
-                        <Grid Width="50" Height="26">
-                            <Border x:Name="Border" Background="#D7CCC8" CornerRadius="13"/>
-                            <Ellipse x:Name="Dot" Fill="White" Width="20" Height="20" HorizontalAlignment="Left" Margin="3,0,0,0">
-                                <Ellipse.Effect>
-                                    <DropShadowEffect ShadowDepth="1" Opacity="0.2"/>
-                                </Ellipse.Effect>
-                            </Ellipse>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
-                                <Setter TargetName="Dot" Property="HorizontalAlignment" Value="Right"/>
-                                <Setter TargetName="Dot" Property="Margin" Value="0,0,3,0"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ImageRadioStyle" TargetType="RadioButton">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="OuterBorder" BorderThickness="2" BorderBrush="Transparent" CornerRadius="8" Margin="5">
-                            <Grid>
-                                <Border CornerRadius="6" ClipToBounds="True" Height="100">
-                                    <Image Source="{TemplateBinding Tag}" Stretch="UniformToFill"/>
-                                </Border>
-                                <Border Background="#CC4E342E" VerticalAlignment="Bottom" Height="30" CornerRadius="0,0,6,6">
-                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                </Border>
-                            </Grid>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bdr" Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
-                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#b9955688"/>
+                                <Setter TargetName="bdr" Property="Opacity" Value="0.9"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#FAFAFA"/>
-            <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="5">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
-                        </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -236,7 +188,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Slider Maximum="100" Value="50" TickFrequency="1"/>
+                                <Slider x:Name="MusicSlider" Maximum="1.0" TickFrequency="0.1" ValueChanged="MusicSlider_ValueChanged"/>
                                 <TextBlock Grid.Column="1" Text="🔊" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
@@ -247,7 +199,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Slider Maximum="100" Value="75" TickFrequency="1"/>
+                                <Slider x:Name="SFXSlider" Maximum="1.0" TickFrequency="0.1" ValueChanged="SFXSlider_ValueChanged"/>
                                 <TextBlock Grid.Column="1" Text="🎵" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
@@ -261,10 +213,13 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid Width="100" Height="100" Margin="0,0,30,0">
-                            <Ellipse Fill="#EEEEEE" Stroke="{StaticResource PrimaryBrush}" StrokeThickness="2"/>
-                            <TextBlock Text="👤" FontSize="40" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Button Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="{StaticResource PrimaryBrush}" BorderThickness="0" Style="{StaticResource PrimaryButtonStyle}" Padding="0">
-                                <TextBlock Text="⬆" Foreground="White" FontWeight="Bold" FontSize="14"/>
+                            <Ellipse Width="100" Height="100" Stroke="{StaticResource PrimaryBrush}" StrokeThickness="2">
+                                <Ellipse.Fill>
+                                    <ImageBrush x:Name="AvatarPreview" ImageSource="/Assets/ImagePiece/red_general_img.png" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Button Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="{StaticResource PrimaryBrush}" BorderThickness="0" Style="{StaticResource PrimaryButtonStyle}" Padding="0" Click="ChangeAvatar_Click">
+                                <TextBlock Text="📷" Foreground="White" FontSize="12"/>
                                 <Button.Resources>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="15"/>
@@ -280,9 +235,9 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Text="Display Name" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,5"/>
-                                    <TextBox Text="Enter your name..."/>
+                                    <TextBox x:Name="NameInput" Text="Enter your name..." Padding="10"/>
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Save Profile" Style="{StaticResource PrimaryButtonStyle}" VerticalAlignment="Bottom"/>
+                                <Button Grid.Column="1" Content="Save Profile" Style="{StaticResource PrimaryButtonStyle}" VerticalAlignment="Bottom" Click="SaveProfile_Click"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
@@ -292,37 +247,41 @@
                     <StackPanel Margin="0,0,0,40">
                         <TextBlock Text="Piece Style" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10" FontWeight="SemiBold"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                            <RadioButton Content="Text (Traditional)" IsChecked="True" Foreground="{StaticResource TextDarkBrush}" GroupName="PieceStyle" Margin="0,0,30,0"/>
-                            <RadioButton Content="Image (Artistic)" Foreground="{StaticResource TextDarkBrush}" GroupName="PieceStyle"/>
+                            <RadioButton x:Name="RadioText" Content="Text (Traditional)" GroupName="PieceStyle" Margin="0,0,30,0" Checked="PieceStyle_Checked" Foreground="{StaticResource TextDarkBrush}"/>
+                            <RadioButton x:Name="RadioImage" Content="Image (Artistic)" GroupName="PieceStyle" Checked="PieceStyle_Checked" Foreground="{StaticResource TextDarkBrush}"/>
                         </StackPanel>
                     </StackPanel>
 
                     <TextBlock Text="Background" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
                     <UniformGrid Columns="3" Margin="0,0,0,40">
-                        <RadioButton Content="Wood" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/5c4033/ffffff?text=Wood" IsChecked="True"/>
-                        <RadioButton Content="Stone" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/555555/ffffff?text=Stone"/>
-                        <RadioButton Content="Minimal" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" Tag="https://via.placeholder.com/300x150/000000/ffffff?text=Minimal"/>
+
+                                <RadioButton Content="Default" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                         Tag="/Assets/Background/Background.png" 
+                         Checked="Background_Checked"/>
+
+                                <RadioButton Content="Black &amp; White" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                         Tag="/Assets/Background/blackwhite_life.jpg" 
+                         Checked="Background_Checked"/>
+
+                                <RadioButton Content="Japanese" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                         Tag="/Assets/Background/japanese.jpg" 
+                         Checked="Background_Checked"/>
+
                     </UniformGrid>
 
-                    <TextBlock Text="Music" Style="{StaticResource SectionHeaderStyle}"/>
+                    <TextBlock Text="Music Playlist" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
                     <Grid Margin="0,0,0,20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="Music On/Off" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
-                            <CheckBox IsChecked="True" Style="{StaticResource ToggleSwitchStyle}" HorizontalAlignment="Left"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Track Selection" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
-                            <ComboBox SelectedIndex="0" Padding="10,5">
-                                <ComboBoxItem Content="Track 1"/>
-                                <ComboBoxItem Content="Track 2"/>
-                                <ComboBoxItem Content="Track 3"/>
+                            <TextBlock Text="Select Track" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
+                            <ComboBox x:Name="MusicCombo" Padding="10,5" SelectionChanged="MusicCombo_SelectionChanged">
+                                <ComboBoxItem Content="Special" Tag="Special.mp3"/>
+                                <ComboBoxItem Content="Tri Ngã" Tag="TriNga~.mp3"/>
+                                <ComboBoxItem Content="Track 1" Tag="1.mp3"/>
+                                <ComboBoxItem Content="Track 2" Tag="2.mp3"/>
+                                <ComboBoxItem Content="Track 3" Tag="3.mp3"/>
+                                <ComboBoxItem Content="Track 4" Tag="4.mp3"/>
                             </ComboBox>
                         </StackPanel>
                     </Grid>

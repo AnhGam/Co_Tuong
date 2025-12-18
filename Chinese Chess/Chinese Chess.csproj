@@ -209,14 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Background\blackwhite_life.jpg" />
-    <Resource Include="Assets\Background\blueyellow_texture.jpg" />
-    <Resource Include="Assets\Background\frenzy_blue.jpg" />
-    <Resource Include="Assets\Background\girl_xianxia.jpg" />
-    <Resource Include="Assets\Background\green_xianxia.jpg" />
     <Resource Include="Assets\Background\japanese.jpg" />
-    <Resource Include="Assets\Background\koi_white.jpg" />
-    <Resource Include="Assets\Background\paper_scoll2.jpg" />
-    <Resource Include="Assets\Background\paper_scroll1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\ImagePiece\black_advisor_img.png" />

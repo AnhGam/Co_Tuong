@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chinese_Chess.Models;
+using System;
 using System.IO;
 using System.Windows.Media;
 
@@ -6,10 +7,10 @@ namespace Chinese_Chess.Helpers
 {
     public static class AudioHelper
     {
-        private static MediaPlayer _bgmPlayer = new MediaPlayer(); 
+        private static MediaPlayer _bgmPlayer = new MediaPlayer();
         private static bool _isMuted = false;
 
-        //Phát nhạc nền (BGM)
+        // Phát nhạc nền (BGM)
         public static void PlayBGM(string fileName)
         {
             string path = GetSoundPath(fileName);
@@ -19,14 +20,23 @@ namespace Chinese_Chess.Helpers
                 _bgmPlayer.MediaEnded += (s, e) =>
                 {
                     _bgmPlayer.Position = TimeSpan.Zero;
-                    _bgmPlayer.Play(); 
+                    _bgmPlayer.Play();
                 };
-                _bgmPlayer.Volume = 0.1; 
+
+
+                _bgmPlayer.Volume = AppSettings.MusicVolume;
+
                 if (!_isMuted) _bgmPlayer.Play();
             }
         }
 
-        //  Phát hiệu ứng (SFX) - Đi quân, ăn quân...
+
+        public static void SetBGMVolume(double volume)
+        {
+            _bgmPlayer.Volume = volume;
+        }
+
+        // Phát hiệu ứng (SFX) - Đi quân, ăn quân...
         public static void PlaySFX(string fileName)
         {
             if (_isMuted) return;
@@ -36,7 +46,9 @@ namespace Chinese_Chess.Helpers
             {
                 MediaPlayer sfx = new MediaPlayer();
                 sfx.Open(new Uri(path));
-                sfx.Volume = 1.0; 
+
+                sfx.Volume = AppSettings.SFXVolume;
+
                 sfx.Play();
             }
         }
@@ -56,9 +68,9 @@ namespace Chinese_Chess.Helpers
             else _bgmPlayer.Play();
         }
 
-
         private static string GetSoundPath(string fileName)
         {
+            // Đảm bảo đường dẫn file chính xác
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sound", fileName);
         }
     }
