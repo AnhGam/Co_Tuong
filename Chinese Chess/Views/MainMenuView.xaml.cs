@@ -57,6 +57,18 @@ namespace Chinese_Chess.Views
                 }
             }
         }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Window mainWindow = Window.GetWindow(this);
+
+            SettingsView settingsScreen = new SettingsView();
+
+            if (mainWindow != null)
+            {
+                mainWindow.Content = settingsScreen;
+            }
+        }
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();

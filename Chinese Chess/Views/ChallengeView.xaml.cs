@@ -13,21 +13,29 @@ namespace Chinese_Chess.Views
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            int selectedDifficulty = 1; // Mặc định là Easy
+            GameViewModel viewModel = new GameViewModel();
 
-            if (OptionEasy.IsChecked == true) selectedDifficulty = 1;
-            else if (OptionMedium.IsChecked == true) selectedDifficulty = 2;
-            else if (OptionHard.IsChecked == true) selectedDifficulty = 3;
-
-            Window mainWindow = Window.GetWindow(this);
-            GameView gameScreen = new GameView();
-
-
-            if (gameScreen.DataContext is GameViewModel vm)
+            if (OptionEasy.IsChecked == true)
             {
-                vm.Difficulty = selectedDifficulty;
+                viewModel.OpponentName = "Bot (Easy)";
+                viewModel.Difficulty = 1;
+            }
+            else if (OptionMedium.IsChecked == true)
+            {
+                viewModel.OpponentName = "Bot (Medium)";
+                viewModel.Difficulty = 2;
+            }
+            else
+            {
+                viewModel.OpponentName = "Bot (Hard)";
+                viewModel.Difficulty = 3;
             }
 
+            GameView gameScreen = new GameView();
+
+            gameScreen.DataContext = viewModel;
+
+            Window mainWindow = Window.GetWindow(this);
             if (mainWindow != null)
             {
                 mainWindow.Content = gameScreen;
