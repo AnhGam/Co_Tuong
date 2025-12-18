@@ -91,6 +91,7 @@
     <Compile Include="Helpers\AudioHelper.cs" />
     <Compile Include="Helpers\FenHelper.cs" />
     <Compile Include="Helpers\UIConverters.cs" />
+    <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\HighlightSpot.cs" />
     <Compile Include="Models\SaveData.cs" />
