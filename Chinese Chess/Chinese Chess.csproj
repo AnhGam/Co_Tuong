@@ -99,6 +99,7 @@
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\HighlightSpot.cs" />
     <Compile Include="Models\SaveData.cs" />
+    <Compile Include="Models\SettingsData.cs" />
     <Compile Include="Services\EngineService.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Views\ChallengeView.xaml.cs">
@@ -189,23 +190,11 @@
   <ItemGroup />
   <ItemGroup>
     <Resource Include="Assets\Button\backward1.png" />
-    <Resource Include="Assets\Button\backward2.png" />
-    <Resource Include="Assets\Button\draw1.png" />
-    <Resource Include="Assets\Button\draw2.png" />
-    <Resource Include="Assets\Button\draw3.png" />
-    <Resource Include="Assets\Button\draw4.png" />
     <Resource Include="Assets\Button\forward1.png" />
-    <Resource Include="Assets\Button\forward2.png" />
     <Resource Include="Assets\Button\pause1.png" />
-    <Resource Include="Assets\Button\pause2.png" />
     <Resource Include="Assets\Button\renew1.png" />
-    <Resource Include="Assets\Button\renew2.png" />
     <Resource Include="Assets\Button\send_icon.png" />
     <Resource Include="Assets\Button\setting.png" />
-    <Resource Include="Assets\Button\surrender1.png" />
-    <Resource Include="Assets\Button\surrender2.png" />
-    <Resource Include="Assets\Button\surrender3.png" />
-    <Resource Include="Assets\Button\surrender4.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Background\blackwhite_life.jpg" />
@@ -255,6 +244,7 @@
     <Resource Include="Assets\Button\play.png" />
     <Resource Include="Assets\Button\GoBack.png" />
     <Resource Include="Assets\Engine\Copying.txt" />
+    <Resource Include="Assets\bot.png" />
     <Content Include="Assets\Engine\pikafish.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

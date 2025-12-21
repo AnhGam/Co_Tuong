@@ -24,7 +24,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style TargetType="{x:Type ScrollBar}">
             <Setter Property="MinWidth" Value="0"/>
             <Setter Property="Width" Value="5"/>
@@ -82,7 +81,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <Style x:Key="ImageRadioStyle" TargetType="RadioButton">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -91,13 +90,10 @@
                         <Border x:Name="OuterBorder" BorderThickness="2" BorderBrush="Transparent" CornerRadius="8" Margin="5">
                             <Grid>
                                 <Border CornerRadius="6" ClipToBounds="True" Height="100">
-                                    <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" 
-                                   Stretch="UniformToFill"/>
+                                    <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="UniformToFill"/>
                                 </Border>
-
                                 <Border Background="#CC4E342E" VerticalAlignment="Bottom" Height="30" CornerRadius="0,0,6,6">
-                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" 
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </Border>
                             </Grid>
                         </Border>
@@ -159,13 +155,24 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Settings Menu" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}" HorizontalAlignment="Center" Margin="0,30,0,25">
-            <TextBlock.Effect>
-                <DropShadowEffect Color="#D7CCC8" BlurRadius="2" ShadowDepth="2" Opacity="0.5"/>
-            </TextBlock.Effect>
-        </TextBlock>
+        <Grid Grid.Row="0" Margin="0,20,0,10">
+            <TextBlock Text="Settings Menu" FontSize="40" FontWeight="Bold" 
+                       Foreground="{StaticResource TextDarkBrush}" HorizontalAlignment="Center">
+                <TextBlock.Effect>
+                    <DropShadowEffect Color="#D7CCC8" BlurRadius="2" ShadowDepth="2" Opacity="0.5"/>
+                </TextBlock.Effect>
+            </TextBlock>
 
-        <Border Grid.Row="1" Background="{StaticResource CardBackgroundBrush}" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" CornerRadius="10" MaxWidth="900" Margin="40,0,40,40">
+            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,30,0"
+                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                    Click="CloseButton_Click">
+                <TextBlock Text="✕" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="1" Background="{StaticResource CardBackgroundBrush}" 
+                BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" 
+                CornerRadius="10" MaxWidth="900" Margin="40,0,40,40">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="5" Color="Gray" Opacity="0.2"/>
             </Border.Effect>
@@ -237,7 +244,6 @@
                                     <TextBlock Text="Display Name" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,5"/>
                                     <TextBox x:Name="NameInput" Text="Enter your name..." Padding="10"/>
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Save Profile" Style="{StaticResource PrimaryButtonStyle}" VerticalAlignment="Bottom" Click="SaveProfile_Click"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
@@ -255,19 +261,17 @@
                     <TextBlock Text="Background" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
                     <UniformGrid Columns="3" Margin="0,0,0,40">
+                        <RadioButton Content="Default" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                                     Tag="pack://application:,,,/Chinese Chess;component/Assets/Background/Background.png" 
+                                     Checked="Background_Checked"/>
 
-                                <RadioButton Content="Default" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                         Tag="/Assets/Background/Background.png" 
-                         Checked="Background_Checked"/>
+                        <RadioButton Content="Black &amp; White" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                                     Tag="pack://application:,,,/Chinese Chess;component/Assets/Background/blackwhite_life.jpg" 
+                                     Checked="Background_Checked"/>
 
-                                <RadioButton Content="Black &amp; White" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                         Tag="/Assets/Background/blackwhite_life.jpg" 
-                         Checked="Background_Checked"/>
-
-                                <RadioButton Content="Japanese" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
-                         Tag="/Assets/Background/japanese.jpg" 
-                         Checked="Background_Checked"/>
-
+                        <RadioButton Content="Japanese" GroupName="BgGroup" Style="{StaticResource ImageRadioStyle}" 
+                                     Tag="pack://application:,,,/Chinese Chess;component/Assets/Background/japanese.jpg" 
+                                     Checked="Background_Checked"/>
                     </UniformGrid>
 
                     <TextBlock Text="Music Playlist" Style="{StaticResource SectionHeaderStyle}"/>
@@ -285,6 +289,12 @@
                             </ComboBox>
                         </StackPanel>
                     </Grid>
+
+                    <Border Style="{StaticResource SectionDividerStyle}" Margin="0,30,0,20"/>
+                    <Button Content="SAVE ALL SETTINGS" Height="50" FontSize="18"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            HorizontalAlignment="Stretch" Margin="0,0,0,10"
+                            Click="SaveAllButton_Click"/>
 
                 </StackPanel>
             </ScrollViewer>

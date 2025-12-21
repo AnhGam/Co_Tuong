@@ -10,31 +10,31 @@ namespace Chinese_Chess.Views
 {
     public partial class SettingsView : UserControl
     {
+        private bool _isLoaded = false;
+        private SettingsData _originalState;
+        private bool _isSaved = false;
+        public event Action OnCloseRequest;
         public SettingsView()
         {
             InitializeComponent();
+
+            _originalState = AppSettings.CreateSnapshot();
+
             LoadCurrentSettings();
+            _isLoaded = true;
         }
 
         private void LoadCurrentSettings()
         {
-            // Load Volume
             MusicSlider.Value = AppSettings.MusicVolume;
             SFXSlider.Value = AppSettings.SFXVolume;
-
-            // Load Profile
             NameInput.Text = AppSettings.PlayerName;
-            try
-            {
-                AvatarPreview.ImageSource = new BitmapImage(new Uri(AppSettings.AvatarPath, UriKind.RelativeOrAbsolute));
-            }
-            catch { }
 
-            // Load Piece Style
+            try { AvatarPreview.ImageSource = new BitmapImage(new Uri(AppSettings.AvatarPath, UriKind.RelativeOrAbsolute)); } catch { }
+
             if (AppSettings.PieceStyleSuffix == "_text") RadioText.IsChecked = true;
             else RadioImage.IsChecked = true;
 
-            // Load Music (Chọn đúng bài đang phát)
             foreach (ComboBoxItem item in MusicCombo.Items)
             {
                 if (item.Tag.ToString() == AppSettings.CurrentMusicTrack)
@@ -45,7 +45,85 @@ namespace Chinese_Chess.Views
             }
         }
 
-        // --- ÂM THANH ---
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsSettingsChanged() && !_isSaved)
+            {
+                var msgBox = new MessageBox(
+                    "Cảnh báo thoát",
+                    "Bạn có thay đổi chưa lưu.\nBạn có muốn lưu lại không?",
+                    "Lưu",
+                    "Không lưu");
+                var result = msgBox.ShowDialog();
+
+                if (result == true)
+                {
+                    SaveAndExit();
+                }
+                else if (result == false)
+                {
+                    AppSettings.RestoreSnapshot(_originalState);
+                    AudioHelper.PlayBGM(AppSettings.CurrentMusicTrack);
+
+                    CloseThisView();
+                }
+            }
+            else
+            {
+                CloseThisView();
+            }
+        }
+
+        private void SaveAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveAndExit();
+        }
+
+        private void SaveAndExit()
+        {
+            AppSettings.PlayerName = NameInput.Text;
+            AppSettings.SaveSettings();
+            _isSaved = true;
+            AppSettings.TriggerChange();
+            CloseThisView();
+        }
+
+
+        private void CloseThisView()
+        {
+            if (OnCloseRequest != null)
+            {
+                OnCloseRequest.Invoke();
+                return;
+            }
+            Window parent = Window.GetWindow(this);
+            if (parent != null && parent.GetType().Name == "SettingsWindow")
+            {
+                parent.Close();
+            }
+            else
+            {
+                this.Visibility = Visibility.Collapsed;
+                if (parent != null) parent.Effect = null;
+            }
+        }
+
+        private bool IsSettingsChanged()
+        {
+            if (NameInput.Text != _originalState.PlayerName) return true;
+            if (Math.Abs(MusicSlider.Value - _originalState.MusicVolume) > 0.01) return true;
+            if (Math.Abs(SFXSlider.Value - _originalState.SFXVolume) > 0.01) return true;
+
+            if (AppSettings.PieceStyleSuffix != _originalState.PieceStyleSuffix) return true;
+            if (AppSettings.CurrentBoardBackground != _originalState.CurrentBoardBackground) return true;
+            if (AppSettings.CurrentMusicTrack != _originalState.CurrentMusicTrack) return true;
+            if (AppSettings.AvatarPath != _originalState.AvatarPath) return true;
+
+            return false;
+        }
+
+
         private void MusicSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             AppSettings.MusicVolume = e.NewValue;
@@ -57,7 +135,6 @@ namespace Chinese_Chess.Views
             AppSettings.SFXVolume = e.NewValue;
         }
 
-        // --- PROFILE ---
         private void ChangeAvatar_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -70,20 +147,11 @@ namespace Chinese_Chess.Views
             }
         }
 
-        private void SaveProfile_Click(object sender, RoutedEventArgs e)
-        {
-            AppSettings.PlayerName = NameInput.Text;
-            MessageBox.Show("Đã lưu thông tin!", "Thông báo");
-            AppSettings.TriggerChange();
-        }
-
-        // --- GAME SETTINGS ---
         private void PieceStyle_Checked(object sender, RoutedEventArgs e)
         {
             if (RadioText.IsChecked == true) AppSettings.PieceStyleSuffix = "_text";
             else AppSettings.PieceStyleSuffix = "_img";
-
-            AppSettings.TriggerChange(); // Báo GameView cập nhật quân cờ
+            AppSettings.TriggerChange();
         }
 
         private void Background_Checked(object sender, RoutedEventArgs e)
@@ -91,19 +159,20 @@ namespace Chinese_Chess.Views
             if (sender is RadioButton rb && rb.Tag != null)
             {
                 AppSettings.CurrentBoardBackground = rb.Tag.ToString();
-                AppSettings.TriggerChange(); // Báo GameView cập nhật nền
+                AppSettings.TriggerChange();
             }
         }
 
         private void MusicCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_isLoaded) return;
             if (MusicCombo.SelectedItem is ComboBoxItem item)
             {
                 string fileName = item.Tag.ToString();
                 if (AppSettings.CurrentMusicTrack != fileName)
                 {
                     AppSettings.CurrentMusicTrack = fileName;
-                    AudioHelper.PlayBGM(fileName); // Phát bài mới
+                    AudioHelper.PlayBGM(fileName);
                 }
             }
         }
