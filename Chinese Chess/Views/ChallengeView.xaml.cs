@@ -17,17 +17,14 @@ namespace Chinese_Chess.Views
 
             if (OptionEasy.IsChecked == true)
             {
-                viewModel.OpponentName = "Bot (Easy)";
                 viewModel.Difficulty = 1;
             }
             else if (OptionMedium.IsChecked == true)
             {
-                viewModel.OpponentName = "Bot (Medium)";
                 viewModel.Difficulty = 2;
             }
             else
             {
-                viewModel.OpponentName = "Bot (Hard)";
                 viewModel.Difficulty = 3;
             }
 

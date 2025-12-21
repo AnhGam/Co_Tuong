@@ -50,26 +50,16 @@ namespace Chinese_Chess.ViewModels
                 // Chỉ in ra màn hình Output của Visual Studio (View -> Output)
                 System.Diagnostics.Debug.WriteLine($"[SERVICE LOG]: {msg}");
             };
+            AppSettings.OnSettingsChanged += () =>
+            {
+                OnPropertyChanged(nameof(PlayerName));
+                OnPropertyChanged(nameof(PlayerAvatar));
+                RefreshPieceImages();
+            };
             StartNewGame();
             AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
 
-        // 1. Khai báo biến private (lưu trữ giá trị thực)
-        private string _opponentName;
-
-        // 2. Khai báo Property public (để Binding ra ngoài)
-        public string OpponentName
-        {
-            get { return _opponentName; }
-            set
-            {
-                if (_opponentName != value)
-                {
-                    _opponentName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         public void StartNewGame()
         {
@@ -81,8 +71,23 @@ namespace Chinese_Chess.ViewModels
             _redoStack.Clear();
 
             ChatMessages.Clear(); 
-
             GameStatus = "Đỏ đi trước";
+
+            switch (Difficulty)
+            {
+                case 1:
+                    BotName = "Easy Bot";
+                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
+                    break;
+                case 2:
+                    BotName = "Medium Bot";
+                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
+                    break;
+                case 3:
+                    BotName = "Hard Bot";
+                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
+                    break;
+            }
 
             InitStandardBoard();
             BoardLogic.Pieces = Pieces.ToList();
@@ -147,12 +152,14 @@ namespace Chinese_Chess.ViewModels
         {
             string suffix = AppSettings.PieceStyleSuffix;
             string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
-
-            foreach (var p in Pieces)
+            var tempList = Pieces.ToList();
+            Pieces.Clear();
+            foreach (var p in tempList)
             {
                 string imgName = $"{p.Color.ToString().ToLower()}_{p.Type.ToString().ToLower()}{suffix}.png";
-
                 p.ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}";
+
+                Pieces.Add(p);
             }
         }
 
@@ -572,6 +579,16 @@ namespace Chinese_Chess.ViewModels
             AddToChat("Người chơi đã đầu hàng. Bot giành chiến thắng!", MessageType.System);
             StopGame();
         }
+
+        public string PlayerName => AppSettings.PlayerName;
+        public string PlayerAvatar => AppSettings.AvatarPath;
+
+        private string _botName;
+        public string BotName { get => _botName; set { _botName = value; OnPropertyChanged(); } }
+
+        private string _botAvatar;
+        public string BotAvatar { get => _botAvatar; set { _botAvatar = value; OnPropertyChanged(); } }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

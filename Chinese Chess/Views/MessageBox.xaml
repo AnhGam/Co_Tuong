@@ -13,7 +13,7 @@
 
         <Grid>
             <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
-                    Background="Transparent" BorderThickness="0" Cursor="Hand" Click="Cancel_Click">
+                    Background="Transparent" BorderThickness="0" Cursor="Hand" Click="CloseBtn_Click">
                 <TextBlock Text="✕" FontSize="16" Foreground="Gray"/>
             </Button>
 

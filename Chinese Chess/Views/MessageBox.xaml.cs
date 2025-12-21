@@ -27,6 +27,10 @@ namespace Chinese_Chess.Views
             this.Close();
         }
 
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close(); 
+        }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {

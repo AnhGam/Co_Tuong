@@ -1,4 +1,5 @@
-﻿using Chinese_Chess.ViewModels;
+﻿using Chinese_Chess.Helpers;
+using Chinese_Chess.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,8 +62,16 @@ namespace Chinese_Chess.Views
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             Window mainWindow = Window.GetWindow(this);
-
             SettingsView settingsScreen = new SettingsView();
+
+            settingsScreen.OnCloseRequest += () =>
+            {
+                if (mainWindow != null)
+                {
+                    mainWindow.Content = this;
+                    AudioHelper.PauseBGM(true);
+                }
+            };
 
             if (mainWindow != null)
             {

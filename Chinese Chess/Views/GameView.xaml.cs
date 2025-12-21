@@ -60,7 +60,8 @@ namespace Chinese_Chess.Views
             AppSettings.OnSettingsChanged += OnAppSettingsChanged;
             UpdateGameAppearance();
             SetupTimer();
-            AudioHelper.PlayBGM("Special.mp3");
+
+            AudioHelper.PlayBGM(AppSettings.CurrentMusicTrack);
             this.Loaded += GameView_Loaded;
             this.Unloaded += GameView_Unloaded;
         }
@@ -68,6 +69,8 @@ namespace Chinese_Chess.Views
         // Khi bắt đầu game -> theo dõi nút thoát
         private void GameView_Loaded(object sender, RoutedEventArgs e)
         {
+            AppSettings.OnSettingsChanged += OnAppSettingsChanged;
+            OnAppSettingsChanged();
             Window window = Window.GetWindow(this);
             if (window != null)
             {
@@ -227,12 +230,7 @@ namespace Chinese_Chess.Views
                 {
                     vm.SaveGame(timeInSeconds, "autosave.json");
                 }
-
-                Window mainWindow = Window.GetWindow(this);
-                if (mainWindow != null)
-                {
-                    mainWindow.Content = new MainMenuView();
-                }
+                QuitToMainMenu();
             }
             else 
             {
@@ -246,9 +244,30 @@ namespace Chinese_Chess.Views
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Cài đặt...");
-        }
+            Window mainWindow = Window.GetWindow(this);
+            SettingsView settingsScreen = new SettingsView();
+            settingsScreen.OnCloseRequest += () =>
+            {
+                if (mainWindow != null)
+                {
+                    mainWindow.Content = this;
+                    OnAppSettingsChanged();
+                }
+            };
 
+            if (mainWindow != null)
+            {
+                mainWindow.Content = settingsScreen;
+            }
+        }
+        private void QuitToMainMenu()
+        {
+
+            AudioHelper.PauseBGM(true); 
+
+            Window mainWindow = Window.GetWindow(this);
+            if (mainWindow != null) mainWindow.Content = new MainMenuView();
+        }
         private void Backward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Undo(); }
         private void Forward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Redo(); }
         private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -297,13 +316,10 @@ namespace Chinese_Chess.Views
                 "Xem lại ván đấu",
                 "Về Menu Chính");
 
-            if (reviewGame)
-            {
-            }
+            if (reviewGame){}
             else
             {
-                Window mainWindow = Window.GetWindow(this);
-                if (mainWindow != null) mainWindow.Content = new MainMenuView();
+                QuitToMainMenu();
             }
         }
         private void ClearAutoSave()
