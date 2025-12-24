@@ -77,10 +77,15 @@
 
 
                 <Viewbox Grid.Row="1" Stretch="Uniform" Margin="0,5">
-                    <Grid Width="600" Height="640">
+                    <Grid x:Name="BoardContainer" Width="600" Height="640" RenderTransformOrigin="0.5,0.5">
+
+                        <Grid.RenderTransform>
+                            <RotateTransform Angle="{Binding BoardRotation}"/>
+                        </Grid.RenderTransform>
+
                         <Image x:Name="BoardImage" Source="/Assets/XiangquiBoard.png" Stretch="Fill"/>
+
                         <ItemsControl ItemsSource="{Binding Pieces}" Width="600" Height="640">
-                            
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas x:Name="BoardCanvas" Background="Transparent" MouseDown="BoardCanvas_MouseDown"/>
@@ -97,22 +102,26 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Visibility="{Binding IsAlive, Converter={StaticResource VisConverter}}">
-
                                         <Ellipse Width="55" Height="55" Stroke="Yellow" StrokeThickness="3" 
-                                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
-                                            Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
+                                     HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
+                                     Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="5"/>
                                             </Ellipse.Effect>
                                         </Ellipse>
 
                                         <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"
-                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   RenderTransformOrigin="0.5,0.5">
+                                            <Image.RenderTransform>
+                                                <RotateTransform Angle="{Binding DataContext.BoardRotation, ElementName=Root}"/>
+                                            </Image.RenderTransform>
+                                        </Image>
+
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        
 
                         <ItemsControl ItemsSource="{Binding ValidMoves}" Width="600" Height="640" IsHitTestVisible="False">
                             <ItemsControl.ItemsPanel>
@@ -130,7 +139,7 @@
                                 <DataTemplate>
                                     <Grid Width="60" Height="60" Margin="-5,-5,0,0">
                                         <Ellipse Width="30" Height="30" Fill="#BF94E4" Opacity="0.4" 
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="8"/>
                                             </Ellipse.Effect>
@@ -142,7 +151,7 @@
 
                     </Grid>
                 </Viewbox>
-
+                
                 <UniformGrid x:Name="ControlBarPanel" Grid.Row="2" Rows="1" Width="600" 
                              HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
 

@@ -79,52 +79,67 @@
     <Grid Background="{StaticResource BackgroundDarkBrush}">
         <Image Source="/Assets/Background/Background.png" Stretch="UniformToFill" Opacity="1"/>
 
-		<Grid MaxWidth="1000" Margin="20">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition Height="*"/>
-				<RowDefinition Height="Auto"/>
-			</Grid.RowDefinitions>
+        <Grid MaxWidth="1000" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-			<StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,40,0,60">
-				<TextBlock Text="CHINESE CHESS"
+            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,40,0,60">
+                <TextBlock Text="CHINESE CHESS"
                            FontSize="60" FontWeight="Black"
                            Foreground="{StaticResource PrimaryBrush}"
                            HorizontalAlignment="Center"
                            TextAlignment="Center">
-					<TextBlock.Effect>
-						<DropShadowEffect ShadowDepth="2" BlurRadius="5" Color="Black" Opacity="0.5"/>
-					</TextBlock.Effect>
-				</TextBlock>
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="2" BlurRadius="5" Color="Black" Opacity="0.5"/>
+                    </TextBlock.Effect>
+                </TextBlock>
 
-				<Grid Margin="0,10,0,0">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
-					<Separator Grid.Column="0" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-					<TextBlock Grid.Column="1" Text="MASTER CHALLENGE"
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Separator Grid.Column="0" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="MASTER CHALLENGE"
                                FontSize="16" Foreground="{DynamicResource PrimaryBrush}"
                                FontWeight="SemiBold" Margin="20,0"
                                Typography.Capitals="AllSmallCaps"/>
-					<Separator Grid.Column="2" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-				</Grid>
-			</StackPanel>
+                    <Separator Grid.Column="2" Background="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
 
-			<Grid Grid.Row="1"
+            <Grid Grid.Row="1"
                   HorizontalAlignment="Center" VerticalAlignment="Center">
 
-				<StackPanel Width="400" VerticalAlignment="Center">
-                    <Button Content="PLAY ONLINE" Style="{StaticResource MenuButtonStyle}"/>
-					<Button Content="NEW GAME" Style="{StaticResource MenuButtonStyle}" Click="NewGameButton_Click"/>
+                <StackPanel Width="400" VerticalAlignment="Center">
+                    <Button Content="PLAY ONLINE" Style="{StaticResource MenuButtonStyle}" Click="PlayOnlineButton_Click"/>
+                    <Button Content="NEW GAME" Style="{StaticResource MenuButtonStyle}" Click="NewGameButton_Click"/>
                     <Button Content="CONTINUE" Style="{StaticResource MenuButtonStyle}" Click="ContinueButton_Click"/>
                     <Button Content="SETTINGS" Style="{StaticResource MenuButtonStyle}" Click="SettingsButton_Click"/>
-					<Button Content="LEAVE" Style="{StaticResource OutlineButtonStyle}" Click="LeaveButton_Click" />
+                    <Button Content="LEAVE" Style="{StaticResource OutlineButtonStyle}" Click="LeaveButton_Click" />
 
-				</StackPanel>
+                </StackPanel>
 
-			</Grid>
-		</Grid>
+            </Grid>
+        </Grid>
+        <Grid x:Name="MatchFindingOverlay" Visibility="Collapsed" Background="#CC1a130c">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="ĐANG TÌM ĐỐI THỦ..." 
+                       FontSize="30" FontWeight="Bold" 
+                       Foreground="{StaticResource PrimaryBrush}" 
+                       HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <ProgressBar IsIndeterminate="True" Width="300" Height="10" 
+                         BorderThickness="0" Background="#333" Foreground="{StaticResource PrimaryBrush}"/>
+
+                <Button Content="HỦY BỎ" Width="150" Height="40" Margin="0,30,0,0"
+                    Style="{StaticResource OutlineButtonStyle}"
+                    Click="CancelSearch_Click"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

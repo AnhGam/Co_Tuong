@@ -1,31 +1,28 @@
 ﻿using Chinese_Chess.Helpers;
 using Chinese_Chess.Models;
 using Chinese_Chess.Models.Chinese_Chess.Models;
+using Chinese_Chess.Services;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics; // [DEBUG]
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Windows;
-using Microsoft.Win32;
-using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Chinese_Chess.Services;
+using System.Windows;
 
 namespace Chinese_Chess.ViewModels
 {
     public class GameViewModel : INotifyPropertyChanged
     {
+        // --- PROPERIES ---
         public ObservableCollection<Piece> Pieces { get; set; }
         public BoardState BoardLogic { get; set; }
-
         private Stack<Move> _redoStack = new Stack<Move>();
-
-        public int LoadedTime { get; set; } = 0;
-        public Action<int> OnGameLoaded;
 
         public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new ObservableCollection<ChatMessage>();
         public ObservableCollection<HighlightSpot> ValidMoves { get; set; } = new ObservableCollection<HighlightSpot>();
@@ -34,6 +31,17 @@ namespace Chinese_Chess.ViewModels
 
         private Piece _selectedPiece;
 
+        // --- ONLINE VARS ---
+        private OnlineService _onlineService;
+        public bool IsOnline { get; set; } = false;
+
+        private bool _isMyTurn = true;
+        public bool IsMyTurn
+        {
+            get => _isMyTurn;
+            set { _isMyTurn = value; OnPropertyChanged(); }
+        }
+
         private string _gameStatus;
         public string GameStatus
         {
@@ -41,135 +49,214 @@ namespace Chinese_Chess.ViewModels
             set { _gameStatus = value; OnPropertyChanged(); }
         }
 
+        private double _boardRotation;
+        public double BoardRotation
+        {
+            get => _boardRotation;
+            set { _boardRotation = value; OnPropertyChanged(); }
+        }
+
+        // --- BOT / PLAYER INFO ---
+        private string _botName = "Bot";
+        public string BotName { get => _botName; set { _botName = value; OnPropertyChanged(); } }
+
+        private string _botAvatar;
+        public string BotAvatar { get => _botAvatar; set { _botAvatar = value; OnPropertyChanged(); } }
+
+        public string PlayerName => AppSettings.PlayerName;
+        public string PlayerAvatar => AppSettings.AvatarPath;
+        public int Difficulty { get; set; } = 1;
+
+        private EngineService _botService = new EngineService();
+        public int LoadedTime { get; set; } = 0;
+        public Action<int> OnGameLoaded;
+        public event Action<string> OnGameEnded;
+
+        // --- CONSTRUCTOR ---
         public GameViewModel()
         {
             BoardLogic = new BoardState();
             Pieces = new ObservableCollection<Piece>();
-            _botService.OnLog = (msg) =>
-            {
-                // Chỉ in ra màn hình Output của Visual Studio (View -> Output)
-                System.Diagnostics.Debug.WriteLine($"[SERVICE LOG]: {msg}");
-            };
+
             AppSettings.OnSettingsChanged += () =>
             {
                 OnPropertyChanged(nameof(PlayerName));
                 OnPropertyChanged(nameof(PlayerAvatar));
                 RefreshPieceImages();
             };
-            StartNewGame();
-            AddToChat("Trò chơi bắt đầu!", MessageType.System);
+
+            //StartNewGame();
         }
 
-
+        // --- START GAME ---
         public void StartNewGame()
         {
+            Debug.WriteLine("[GameViewModel] StartNewGame được gọi.");
             BoardLogic.Reset();
             Pieces.Clear();
             CapturedRedPieces.Clear();
             CapturedBlackPieces.Clear();
             ValidMoves.Clear();
             _redoStack.Clear();
+            ChatMessages.Clear();
 
-            ChatMessages.Clear(); 
-            GameStatus = "Đỏ đi trước";
+            GameStatus = "Lượt Đỏ";
+            IsMyTurn = true;
+            IsOnline = false;
+            BoardRotation = 0;
 
-            switch (Difficulty)
-            {
-                case 1:
-                    BotName = "Easy Bot";
-                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
-                    break;
-                case 2:
-                    BotName = "Medium Bot";
-                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
-                    break;
-                case 3:
-                    BotName = "Hard Bot";
-                    BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
-                    break;
-            }
-
+            InitBotInfo();
             InitStandardBoard();
             BoardLogic.Pieces = Pieces.ToList();
+            AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
 
-        // Khởi tạo 32 quân cờ
-        private void InitStandardBoard()
+        private void InitBotInfo()
         {
-            // 1. QUÂN ĐEN (Trên)
-            AddPiece(PieceType.Rook, PieceColor.Black, 0, 0);
-            AddPiece(PieceType.Horse, PieceColor.Black, 1, 0);
-            AddPiece(PieceType.Elephant, PieceColor.Black, 2, 0);
-            AddPiece(PieceType.Advisor, PieceColor.Black, 3, 0);
-            AddPiece(PieceType.General, PieceColor.Black, 4, 0);
-            AddPiece(PieceType.Advisor, PieceColor.Black, 5, 0);
-            AddPiece(PieceType.Elephant, PieceColor.Black, 6, 0);
-            AddPiece(PieceType.Horse, PieceColor.Black, 7, 0);
-            AddPiece(PieceType.Rook, PieceColor.Black, 8, 0);
-            AddPiece(PieceType.Cannon, PieceColor.Black, 1, 2);
-            AddPiece(PieceType.Cannon, PieceColor.Black, 7, 2);
-            for (int i = 0; i <= 8; i += 2) AddPiece(PieceType.Soldier, PieceColor.Black, i, 3);
-
-            // 2. QUÂN ĐỎ (Dưới)
-            AddPiece(PieceType.Rook, PieceColor.Red, 0, 9);
-            AddPiece(PieceType.Horse, PieceColor.Red, 1, 9);
-            AddPiece(PieceType.Elephant, PieceColor.Red, 2, 9);
-            AddPiece(PieceType.Advisor, PieceColor.Red, 3, 9);
-            AddPiece(PieceType.General, PieceColor.Red, 4, 9);
-            AddPiece(PieceType.Advisor, PieceColor.Red, 5, 9);
-            AddPiece(PieceType.Elephant, PieceColor.Red, 6, 9);
-            AddPiece(PieceType.Horse, PieceColor.Red, 7, 9);
-            AddPiece(PieceType.Rook, PieceColor.Red, 8, 9);
-            AddPiece(PieceType.Cannon, PieceColor.Red, 1, 7);
-            AddPiece(PieceType.Cannon, PieceColor.Red, 7, 7);
-            for (int i = 0; i <= 8; i += 2) AddPiece(PieceType.Soldier, PieceColor.Red, i, 6);
-        }
-
-        // Trong GameViewModel.cs
-
-
-        private void AddPiece(PieceType type, PieceColor color, int x, int y)
-        {
-            string suffix = AppSettings.PieceStyleSuffix;
-
-            // Tạo tên file
-            string imgName = $"{color.ToString().ToLower()}_{type.ToString().ToLower()}{suffix}.png";
-            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
-
-            Pieces.Add(new Piece
+            switch (Difficulty)
             {
-                Type = type,
-                Color = color,
-                X = x,
-                Y = y,
+                case 1: BotName = "Easy Bot"; break;
+                case 2: BotName = "Medium Bot"; break;
+                case 3: BotName = "Hard Bot"; break;
+                default: BotName = "Bot"; break;
+            }
+            BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
+        }
 
-                ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}",
-                IsAlive = true
+        // --- ONLINE LOGIC ---
+
+        public void ContinueOnlineMatch(OnlineService service)
+        {
+            Debug.WriteLine("[GameViewModel] Bắt đầu thiết lập trận Online...");
+            _onlineService = service;
+            IsOnline = true;
+
+            // ✅ ĐĂNG KÝ EVENT HANDLERS TRƯỚC
+            _onlineService.OnMoveReceived -= HandleOnlineMove;
+            _onlineService.OnMoveReceived += HandleOnlineMove;
+
+            _onlineService.OnChatReceived -= HandleOnlineChat;
+            _onlineService.OnChatReceived += HandleOnlineChat;
+
+            // ✅ Reset bàn cờ
+            StartNewGame();
+            IsOnline = true; // Set lại vì StartNewGame reset nó về false
+
+            // ✅ Setup Phe
+            if (_onlineService.MySide == "RED")
+            {
+                Debug.WriteLine("[GameViewModel] Phe: ĐỎ (Đi trước)");
+                BoardRotation = 0;
+                IsMyTurn = true;
+                BotName = "Đối thủ (ĐEN)";
+                GameStatus = "Lượt Đỏ";
+                AddToChat("Bạn cầm quân ĐỎ (Đi trước).", MessageType.System);
+            }
+            else
+            {
+                Debug.WriteLine("[GameViewModel] Phe: ĐEN (Đi sau)");
+                BoardRotation = 180;
+                IsMyTurn = false;
+                BotName = "Đối thủ (ĐỎ)";
+                GameStatus = "Lượt Đỏ";
+                AddToChat("Bạn cầm quân ĐEN (Đi sau).", MessageType.System);
+            }
+
+            Debug.WriteLine($"[GameViewModel] Setup xong. MySide={_onlineService.MySide}, Listeners đã sẵn sàng");
+        }
+
+        // XỬ LÝ NHẬN MOVE
+        private void HandleOnlineMove(string moveStr)
+        {
+            Debug.WriteLine($"[GameViewModel] -> Đã nhận lệnh đi quân từ mạng: {moveStr}");
+
+            var parts = moveStr.Split(',');
+            if (parts.Length < 4) return;
+
+            int fx = int.Parse(parts[0]);
+            int fy = int.Parse(parts[1]);
+            int tx = int.Parse(parts[2]);
+            int ty = int.Parse(parts[3]);
+
+            // Dùng Dispatcher để update UI
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    Piece piece = BoardLogic.GetPieceAt(fx, fy);
+                    if (piece == null)
+                    {
+                        Debug.WriteLine($"[LỖI] Không tìm thấy quân tại {fx},{fy} để đi!");
+                        return;
+                    }
+
+                    var target = BoardLogic.GetPieceAt(tx, ty);
+                    var move = new Move(piece, fx, fy, tx, ty);
+
+                    Debug.WriteLine($"[GameViewModel] Thực hiện move: {piece.Type} to {tx},{ty}");
+                    ExecuteMove(move, target);
+
+                    // Cập nhật lượt
+                    IsMyTurn = true;
+                    AudioHelper.PlaySFX("Play.mp3");
+                    CheckGameState();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[LỖI] HandleOnlineMove Exception: {ex.Message}");
+                }
             });
         }
 
-        public void RefreshPieceImages()
+        // XỬ LÝ NHẬN CHAT
+        private void HandleOnlineChat(string chatData)
         {
-            string suffix = AppSettings.PieceStyleSuffix;
-            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
-            var tempList = Pieces.ToList();
-            Pieces.Clear();
-            foreach (var p in tempList)
+            Debug.WriteLine($"[GameViewModel] HandleOnlineChat được gọi với: {chatData}");
+            
+            var parts = chatData.Split(new[] { ':' }, 2);
+            if (parts.Length < 2) 
             {
-                string imgName = $"{p.Color.ToString().ToLower()}_{p.Type.ToString().ToLower()}{suffix}.png";
-                p.ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}";
+                Debug.WriteLine($"[GameViewModel CHAT ERROR] Format sai, expected 'SIDE:message', nhận: {chatData}");
+                return;
+            }
 
-                Pieces.Add(p);
+            string senderSide = parts[0];
+            string msg = parts[1];
+
+            Debug.WriteLine($"[GameViewModel CHAT] senderSide={senderSide}, msg={msg}");
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                AddToChat(msg, MessageType.Player, senderSide);
+            });
+        }
+
+        // GỬI CHAT
+        public async void SendChatOnline(string message)
+        {
+            AddToChat(message, MessageType.Player, "Me");
+
+            if (IsOnline && _onlineService != null)
+            {
+                string data = $"{AppSettings.PlayerName}:{message}";
+                Debug.WriteLine($"[GameViewModel] Gửi chat: {data}");
+                await _onlineService.SendChat(data);
             }
         }
 
-        // Xử lý Click (Logic chọn và đi)
-        public void OnTileClicked(int x, int y)
+        // --- GAME LOGIC ---
+
+        public async void OnTileClicked(int x, int y)
         {
-            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
+            if (IsOnline && !IsMyTurn)
+            {
+                Debug.WriteLine("[GameViewModel] Click chặn: Chưa đến lượt.");
+                return;
+            }
+
             var clickedPiece = BoardLogic.GetPieceAt(x, y);
 
-            if (_selectedPiece == null)
+            if (_selectedPiece == null || (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn))
             {
                 if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
                 {
@@ -178,78 +265,54 @@ namespace Chinese_Chess.ViewModels
                 }
                 return;
             }
-            if (clickedPiece == _selectedPiece)
-            {
-                ClearSelection();
-                return;
-            }
-            if (clickedPiece != null && clickedPiece.Color == BoardLogic.CurrentTurn)
-            {
-                SelectPiece(clickedPiece);
-                ShowValidMoves(_selectedPiece);
-                return;
-            }
+
+            // Thực hiện đi quân
             var move = new Move(_selectedPiece, _selectedPiece.X, _selectedPiece.Y, x, y);
 
             if (MoveValidator.IsValidMove(BoardLogic, move))
             {
-                ExecuteMove(move, clickedPiece); 
-                TriggerBotTurn();
+                ExecuteMove(move, clickedPiece);
+
+                if (IsOnline)
+                {
+                    IsMyTurn = false;
+                    string moveStr = $"{move.FromX},{move.FromY},{move.ToX},{move.ToY}";
+                    Debug.WriteLine($"[GameViewModel] Người chơi đi. Gửi mạng: {moveStr}");
+                    await _onlineService.SendMove(moveStr);
+                }
+                else
+                {
+                    TriggerBotTurn();
+                }
             }
             else
             {
                 ClearSelection();
             }
         }
-        private void ShowValidMoves(Piece p)
-        {
-            ValidMoves.Clear();
-            // Lấy tất cả nước đi an toàn của quân này
-            var moves = MoveValidator.GetSafeMoves(BoardLogic, p);
-
-            foreach (var m in moves)
-            {
-                ValidMoves.Add(new HighlightSpot { X = m.x, Y = m.y });
-            }
-        }
-        private void SelectPiece(Piece p)
-        {
-            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
-            _selectedPiece = p;
-            _selectedPiece.IsSelected = true;
-        }
-
-        private void ClearSelection()
-        {
-            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
-            _selectedPiece = null;
-            ValidMoves.Clear();
-        }
 
         private void ExecuteMove(Move move, Piece target)
         {
             if (target != null)
             {
-                // target.IsAlive = false;
-
                 if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
                 else CapturedBlackPieces.Add(target);
             }
-            BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
 
+            BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
             AudioHelper.PlaySFX("Play.mp3");
+
             _redoStack.Clear();
             ClearSelection();
-            CheckGameState();
+            // CheckGameState gọi sau
         }
-
-        public event Action<string> OnGameEnded;
 
         private void CheckGameState()
         {
             var nextTurn = BoardLogic.CurrentTurn;
-            bool canMove = MoveValidator.HasAnyValidMove(BoardLogic, nextTurn);
+            GameStatus = (nextTurn == PieceColor.Red) ? "Lượt Đỏ" : "Lượt Đen";
 
+            bool canMove = MoveValidator.HasAnyValidMove(BoardLogic, nextTurn);
             if (!canMove)
             {
                 string winner = (nextTurn == PieceColor.Red ? "ĐEN" : "ĐỎ");
@@ -260,66 +323,44 @@ namespace Chinese_Chess.ViewModels
                 return;
             }
 
-            bool isCheck = MoveValidator.IsInCheck(BoardLogic, nextTurn);
-            if (isCheck)
+            if (MoveValidator.IsInCheck(BoardLogic, nextTurn))
             {
                 GameStatus = "CHIẾU TƯỚNG!";
             }
-            else
-            {
-                GameStatus = nextTurn == PieceColor.Red ? "Lượt Đỏ" : "Lượt Đen";
-            }
         }
 
-        public void Undo()
+        // --- HELPERS ---
+
+        private async void TriggerBotTurn()
         {
-            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
-            int stepsToUndo = 2;
-            if (BoardLogic.Moves.Count < 2) stepsToUndo = 1;
+            if (GameStatus.Contains("THẮNG")) return;
 
-            for (int i = 0; i < stepsToUndo; i++)
+            int delayTime = (Difficulty == 3) ? 1000 : 500;
+            await Task.Delay(delayTime);
+
+            int depth = (Difficulty == 1) ? 2 : (Difficulty == 2 ? 5 : 7);
+
+            try
             {
-                var move = BoardLogic.UndoLastMove();
-                if (move == null) break;
-                if (move.CapturedPiece != null)
-                {
-                    if (move.CapturedPiece.Color == PieceColor.Black)
-                        CapturedRedPieces.Remove(move.CapturedPiece);
-                    else
-                        CapturedBlackPieces.Remove(move.CapturedPiece);
-                }
-                _redoStack.Push(move);
-            }
+                string fen = FenHelper.GetFen(BoardLogic);
+                var botMove = await _botService.GetBestMoveAsync(fen, depth);
 
-            _selectedPiece = null;
-            ValidMoves.Clear();
-            CheckGameState();
-        }
-
-        public void Redo()
-        {
-            if (_redoStack.Count == 0) return;
-
-            while (_redoStack.Count > 0)
-            {
-                var move = _redoStack.Pop();
-                var target = BoardLogic.GetPieceAt(move.ToX, move.ToY);
-                if (target != null)
+                if (botMove != null)
                 {
-                    // target.IsAlive = false;
-                    if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
-                    else CapturedBlackPieces.Add(target);
-                }
-                BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
-                if (BoardLogic.CurrentTurn == PieceColor.Red)
-                {
-                    break;
+                    var pieceToMove = BoardLogic.GetPieceAt(botMove.FromX, botMove.FromY);
+                    var targetPiece = BoardLogic.GetPieceAt(botMove.ToX, botMove.ToY);
+
+                    if (pieceToMove != null)
+                    {
+                        var move = new Move(pieceToMove, botMove.FromX, botMove.FromY, botMove.ToX, botMove.ToY);
+                        ExecuteMove(move, targetPiece);
+                        CheckGameState();
+                    }
                 }
             }
-            CheckGameState();
-            if (BoardLogic.CurrentTurn == PieceColor.Black && _redoStack.Count == 0)
+            catch (Exception ex)
             {
-                TriggerBotTurn();
+                MessageBox.Show("Bot lỗi: " + ex.Message);
             }
         }
 
@@ -337,21 +378,164 @@ namespace Chinese_Chess.ViewModels
             });
         }
 
+        private void InitStandardBoard()
+        {
+            // QUÂN ĐEN
+            AddPiece(PieceType.Rook, PieceColor.Black, 0, 0);
+            AddPiece(PieceType.Horse, PieceColor.Black, 1, 0);
+            AddPiece(PieceType.Elephant, PieceColor.Black, 2, 0);
+            AddPiece(PieceType.Advisor, PieceColor.Black, 3, 0);
+            AddPiece(PieceType.General, PieceColor.Black, 4, 0);
+            AddPiece(PieceType.Advisor, PieceColor.Black, 5, 0);
+            AddPiece(PieceType.Elephant, PieceColor.Black, 6, 0);
+            AddPiece(PieceType.Horse, PieceColor.Black, 7, 0);
+            AddPiece(PieceType.Rook, PieceColor.Black, 8, 0);
+            AddPiece(PieceType.Cannon, PieceColor.Black, 1, 2);
+            AddPiece(PieceType.Cannon, PieceColor.Black, 7, 2);
+            for (int i = 0; i <= 8; i += 2) AddPiece(PieceType.Soldier, PieceColor.Black, i, 3);
+
+            // QUÂN ĐỎ
+            AddPiece(PieceType.Rook, PieceColor.Red, 0, 9);
+            AddPiece(PieceType.Horse, PieceColor.Red, 1, 9);
+            AddPiece(PieceType.Elephant, PieceColor.Red, 2, 9);
+            AddPiece(PieceType.Advisor, PieceColor.Red, 3, 9);
+            AddPiece(PieceType.General, PieceColor.Red, 4, 9);
+            AddPiece(PieceType.Advisor, PieceColor.Red, 5, 9);
+            AddPiece(PieceType.Elephant, PieceColor.Red, 6, 9);
+            AddPiece(PieceType.Horse, PieceColor.Red, 7, 9);
+            AddPiece(PieceType.Rook, PieceColor.Red, 8, 9);
+            AddPiece(PieceType.Cannon, PieceColor.Red, 1, 7);
+            AddPiece(PieceType.Cannon, PieceColor.Red, 7, 7);
+            for (int i = 0; i <= 8; i += 2) AddPiece(PieceType.Soldier, PieceColor.Red, i, 6);
+        }
+
+        private void AddPiece(PieceType type, PieceColor color, int x, int y)
+        {
+            string suffix = AppSettings.PieceStyleSuffix;
+            string imgName = $"{color.ToString().ToLower()}_{type.ToString().ToLower()}{suffix}.png";
+            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
+
+            Pieces.Add(new Piece
+            {
+                Type = type,
+                Color = color,
+                X = x,
+                Y = y,
+                ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}",
+                IsAlive = true
+            });
+        }
+
+        public void RefreshPieceImages()
+        {
+            string suffix = AppSettings.PieceStyleSuffix;
+            string folder = (suffix == "_text") ? "TextPiece" : "ImagePiece";
+            var tempList = Pieces.ToList();
+            Pieces.Clear();
+            foreach (var p in tempList)
+            {
+                string imgName = $"{p.Color.ToString().ToLower()}_{p.Type.ToString().ToLower()}{suffix}.png";
+                p.ImagePath = $"pack://application:,,,/Chinese Chess;component/Assets/{folder}/{imgName}";
+                Pieces.Add(p);
+            }
+        }
+
+        private void ShowValidMoves(Piece p)
+        {
+            ValidMoves.Clear();
+            var moves = MoveValidator.GetSafeMoves(BoardLogic, p);
+            foreach (var m in moves)
+            {
+                ValidMoves.Add(new HighlightSpot { X = m.x, Y = m.y });
+            }
+        }
+
+        private void SelectPiece(Piece p)
+        {
+            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
+            _selectedPiece = p;
+            _selectedPiece.IsSelected = true;
+        }
+
+        private void ClearSelection()
+        {
+            if (_selectedPiece != null) _selectedPiece.IsSelected = false;
+            _selectedPiece = null;
+            ValidMoves.Clear();
+        }
+
+        public void StopGame()
+        {
+            if (IsOnline) return;
+            _botService.StopEngine();
+        }
+
+        public void Surrender()
+        {
+            if (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA")) return;
+            GameStatus = "ĐEN THẮNG (Đầu hàng)";
+            AddToChat("Người chơi đã đầu hàng.", MessageType.System);
+            StopGame();
+        }
+
+        // --- UNDO / REDO / SAVE / LOAD ---
+        public void Undo()
+        {
+            if (IsOnline) return;
+            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
+            int steps = (BoardLogic.Moves.Count < 2) ? 1 : 2;
+            for (int i = 0; i < steps; i++)
+            {
+                var m = BoardLogic.UndoLastMove();
+                if (m != null)
+                {
+                    if (m.CapturedPiece != null)
+                    {
+                        if (m.CapturedPiece.Color == PieceColor.Black) CapturedRedPieces.Remove(m.CapturedPiece);
+                        else CapturedBlackPieces.Remove(m.CapturedPiece);
+                    }
+                    _redoStack.Push(m);
+                }
+            }
+            ClearSelection();
+            CheckGameState();
+        }
+
+        public void Redo()
+        {
+            if (IsOnline) return;
+            if (_redoStack.Count == 0) return;
+
+            while (_redoStack.Count > 0)
+            {
+                var move = _redoStack.Pop();
+                var target = BoardLogic.GetPieceAt(move.ToX, move.ToY);
+                if (target != null)
+                {
+                    if (target.Color == PieceColor.Black) CapturedRedPieces.Add(target);
+                    else CapturedBlackPieces.Add(target);
+                }
+                BoardLogic.MovePiece(move.MovedPiece, move.ToX, move.ToY);
+                if (BoardLogic.CurrentTurn == PieceColor.Red) break;
+            }
+            CheckGameState();
+            if (BoardLogic.CurrentTurn == PieceColor.Black && _redoStack.Count == 0)
+            {
+                TriggerBotTurn();
+            }
+        }
 
         private const string AutoSaveFile = "autosave.json";
         public void SaveGame(int currentTimeSeconds, string filePath = null)
         {
-
-
+            if (IsOnline) { return; }
             var saveData = new GameSaveData
             {
                 GameTimeSeconds = currentTimeSeconds,
                 CurrentTurn = BoardLogic.CurrentTurn.ToString(),
                 Difficulty = this.Difficulty,
                 ChatHistory = new List<ChatMessage>(ChatMessages)
-
             };
-
 
             foreach (var p in BoardLogic.Pieces)
             {
@@ -367,17 +551,8 @@ namespace Chinese_Chess.ViewModels
                 });
             }
 
-
-            foreach (var m in BoardLogic.Moves)
-            {
-                saveData.MoveHistory.Add(ConvertToRecord(m));
-            }
-
-
-            foreach (var m in _redoStack)
-            {
-                saveData.RedoStack.Add(ConvertToRecord(m));
-            }
+            foreach (var m in BoardLogic.Moves) saveData.MoveHistory.Add(ConvertToRecord(m));
+            foreach (var m in _redoStack) saveData.RedoStack.Add(ConvertToRecord(m));
 
             string jsonString = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = true });
 
@@ -400,7 +575,6 @@ namespace Chinese_Chess.ViewModels
         public bool LoadGame(string filePath = null)
         {
             string content = "";
-
             if (!string.IsNullOrEmpty(filePath))
             {
                 if (!File.Exists(filePath)) return false;
@@ -408,35 +582,27 @@ namespace Chinese_Chess.ViewModels
             }
             else
             {
-                // Load thủ công
                 OpenFileDialog dialog = new OpenFileDialog();
                 dialog.Filter = "Chinese Chess Save (*.json)|*.json";
-                if (dialog.ShowDialog() == true)
-                {
-                    content = File.ReadAllText(dialog.FileName);
-                }
-                else return false; 
+                if (dialog.ShowDialog() == true) content = File.ReadAllText(dialog.FileName);
+                else return false;
             }
 
             try
             {
                 var saveData = JsonSerializer.Deserialize<GameSaveData>(content);
-                RestoreGameFromData(saveData); 
+                RestoreGameFromData(saveData);
                 return true;
             }
-            catch
-            {
-                return false;
-            }
+            catch { return false; }
         }
 
-        // Hàm hỗ trợ: Chuyển Move object thành MoveRecord (để lưu)
         private MoveRecord ConvertToRecord(Move m)
         {
             return new MoveRecord
             {
                 PieceId = m.MovedPiece.Id,
-                CapturedPieceId = m.CapturedPiece?.Id, // Có thể null
+                CapturedPieceId = m.CapturedPiece?.Id,
                 FromX = m.FromX,
                 FromY = m.FromY,
                 ToX = m.ToX,
@@ -444,27 +610,20 @@ namespace Chinese_Chess.ViewModels
             };
         }
 
-        // Hàm hỗ trợ: Khôi phục game từ dữ liệu Save
         private void RestoreGameFromData(GameSaveData data)
         {
-            Pieces.Clear();
-            CapturedRedPieces.Clear();
-            CapturedBlackPieces.Clear();
-            BoardLogic.Reset();
-            _redoStack.Clear();
-            ChatMessages.Clear();
+            Pieces.Clear(); CapturedRedPieces.Clear(); CapturedBlackPieces.Clear();
+            BoardLogic.Reset(); _redoStack.Clear(); ChatMessages.Clear();
 
             this.Difficulty = data.Difficulty;
-            // 2. Khôi phục Chat
             foreach (var chat in data.ChatHistory) ChatMessages.Add(chat);
 
-            // 3. Khôi phục Quân cờ
             var restoredPieces = new List<Piece>();
             foreach (var rec in data.AllPieces)
             {
                 var p = new Piece
                 {
-                    Id = rec.Id, 
+                    Id = rec.Id,
                     Type = rec.Type,
                     Color = rec.Color,
                     X = rec.X,
@@ -472,123 +631,37 @@ namespace Chinese_Chess.ViewModels
                     IsAlive = rec.IsAlive,
                     ImagePath = rec.ImagePath
                 };
-
                 restoredPieces.Add(p);
-                Pieces.Add(p); 
-
-                
+                Pieces.Add(p);
                 if (!p.IsAlive)
                 {
                     if (p.Color == PieceColor.Black) CapturedRedPieces.Add(p);
                     else CapturedBlackPieces.Add(p);
                 }
             }
-            BoardLogic.Pieces = restoredPieces; 
-
-            // 4. Khôi phục Lượt đi
+            BoardLogic.Pieces = restoredPieces;
             BoardLogic.CurrentTurn = (PieceColor)Enum.Parse(typeof(PieceColor), data.CurrentTurn);
 
-            // 5. Khôi phục Lịch sử Moves
-            
             foreach (var rec in data.MoveHistory)
             {
-                var movedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
-                var capturedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
-
-                if (movedPiece != null)
-                {
-                    var move = new Move(movedPiece, rec.FromX, rec.FromY, rec.ToX, rec.ToY, capturedPiece);
-                    BoardLogic.Moves.Add(move);
-                }
+                var moved = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
+                var captured = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
+                if (moved != null) BoardLogic.Moves.Add(new Move(moved, rec.FromX, rec.FromY, rec.ToX, rec.ToY, captured));
             }
 
-            // 6. Khôi phục Redo Stack 
             var redoList = new List<Move>();
             foreach (var rec in data.RedoStack)
             {
-                var movedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
-                var capturedPiece = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
-                if (movedPiece != null)
-                {
-                    redoList.Add(new Move(movedPiece, rec.FromX, rec.FromY, rec.ToX, rec.ToY, capturedPiece));
-                }
+                var moved = restoredPieces.FirstOrDefault(p => p.Id == rec.PieceId);
+                var captured = restoredPieces.FirstOrDefault(p => p.Id == rec.CapturedPieceId);
+                if (moved != null) redoList.Add(new Move(moved, rec.FromX, rec.FromY, rec.ToX, rec.ToY, captured));
             }
-            // Đẩy vào stack 
-            for (int i = redoList.Count - 1; i >= 0; i--)
-            {
-                _redoStack.Push(redoList[i]);
-            }
+            for (int i = redoList.Count - 1; i >= 0; i--) _redoStack.Push(redoList[i]);
+
             LoadedTime = data.GameTimeSeconds;
             OnGameLoaded?.Invoke(LoadedTime);
-
             CheckGameState();
         }
-
-        private EngineService _botService = new EngineService();
-        public int Difficulty { get; set; } = 1;
-
-        private async void TriggerBotTurn()
-        {
-            if (GameStatus.Contains("THẮNG")) return;
-
-            // Delay 1 giây fake
-            int delayTime = 500; 
-            if(Difficulty == 3) delayTime = 1000;
-            await Task.Delay(delayTime);
-
-            // điều chỉnh độ khó (depth = số nước nhìn trước)
-            int depth = 2;
-            switch (Difficulty)
-            {
-                case 1: depth = 2; break;
-                case 2: depth = 5; break;
-                case 3: depth = 9; break;
-            }
-            try
-            {
-                string fen = FenHelper.GetFen(BoardLogic);
-                var botMove = await _botService.GetBestMoveAsync(fen, depth);
-
-                if (botMove != null)
-                {
-                    var pieceToMove = BoardLogic.GetPieceAt(botMove.FromX, botMove.FromY);
-                    var targetPiece = BoardLogic.GetPieceAt(botMove.ToX, botMove.ToY);
-
-                    if (pieceToMove != null)
-                    {
-                        var move = new Move(pieceToMove, botMove.FromX, botMove.FromY, botMove.ToX, botMove.ToY);
-                        ExecuteMove(move, targetPiece);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Bot gặp lỗi: " + ex.Message);
-            }
-        }
-
-        public void StopGame()
-        {
-            _botService.StopEngine();
-        }
-
-        public void Surrender()
-        {
-            if (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA")) return;
-            GameStatus = "ĐEN THẮNG (Đầu hàng)";
-            AddToChat("Người chơi đã đầu hàng. Bot giành chiến thắng!", MessageType.System);
-            StopGame();
-        }
-
-        public string PlayerName => AppSettings.PlayerName;
-        public string PlayerAvatar => AppSettings.AvatarPath;
-
-        private string _botName;
-        public string BotName { get => _botName; set { _botName = value; OnPropertyChanged(); } }
-
-        private string _botAvatar;
-        public string BotAvatar { get => _botAvatar; set { _botAvatar = value; OnPropertyChanged(); } }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
