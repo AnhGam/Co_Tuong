@@ -166,6 +166,13 @@ namespace Chinese_Chess.Views
 
         private void Pause_Click(object sender, RoutedEventArgs e)
         {
+            if (this .DataContext is GameViewModel vm)
+            {
+                if (vm.IsOnline)
+                {
+                    return;
+                }
+            }
             isPaused = !isPaused;
             AudioHelper.PauseBGM(isPaused);
             if (isPaused)
@@ -190,6 +197,13 @@ namespace Chinese_Chess.Views
 
         private void New_Game_Click(object sender, RoutedEventArgs e)
         {
+            if(this.DataContext is GameViewModel vm)
+            {
+                if (vm.IsOnline)
+                {
+                    return;
+                }
+            }
             timeInSeconds = 0;
             isPaused = false;
             if (GameTimerLabel != null) GameTimerLabel.Content = "00:00";
@@ -218,11 +232,11 @@ namespace Chinese_Chess.Views
             isPaused = true;
             gameTimer.Stop();
             // (éo biết bị gì những cần đưa vào title và message ngược nhau mới đúng)
-            bool result = MessageBox.Show(
+            bool result = (this.DataContext as GameViewModel).IsOnline?MessageBox.Show(
                 "Mọi tiến độ trong trò chơi sẽ được lưu vào lần chơi kế tiếp.",
                 "Thoát ra màn hình chính?",
                 "Đồng ý",
-                "Hủy");
+                "Hủy"): MessageBox.Show("Thoát ra sẽ tính như bạn đầu hàng", "Thoát ra màn hình chính?", "Đồng ý", "Hủy");
 
             if (result) 
             {
@@ -268,8 +282,14 @@ namespace Chinese_Chess.Views
             Window mainWindow = Window.GetWindow(this);
             if (mainWindow != null) mainWindow.Content = new MainMenuView();
         }
-        private void Backward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Undo(); }
-        private void Forward_Click(object sender, RoutedEventArgs e) { (this.DataContext as GameViewModel)?.Redo(); }
+        private void Backward_Click(object sender, RoutedEventArgs e) {
+            if(_isGameFinished)
+                (this.DataContext as GameViewModel).Undo(); 
+        }
+        private void Forward_Click(object sender, RoutedEventArgs e) { 
+            if(_isGameFinished)
+                (this.DataContext as GameViewModel)?.Redo(); 
+        }
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             SendMessage();
@@ -286,7 +306,14 @@ namespace Chinese_Chess.Views
 
             if (this.DataContext is GameViewModel vm)
             {
-                vm.AddToChat(msg, MessageType.Player, "Me");
+                if (vm.IsOnline)
+                {
+                    vm.SendChatOnline(msg);
+                }
+                else
+                {
+                    vm.AddToChat(msg, MessageType.Player, "Me");
+                }
             }
 
             ChatInputBox.Text = "";

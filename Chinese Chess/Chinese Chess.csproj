@@ -115,6 +115,7 @@
     <Compile Include="Models\SaveData.cs" />
     <Compile Include="Models\SettingsData.cs" />
     <Compile Include="Services\EngineService.cs" />
+    <Compile Include="Services\OnlineService.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="Views\ChallengeView.xaml.cs">
       <DependentUpon>ChallengeView.xaml</DependentUpon>
