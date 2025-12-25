@@ -135,7 +135,7 @@
         <Button Content="Back to Menu"
                 FontSize="16" FontWeight="SemiBold"
                 Foreground="{StaticResource BackButtonBrush}"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="30" Cursor="Hand" Panel.ZIndex="2"
                 Click="BackToMenuButton_Click">
 
