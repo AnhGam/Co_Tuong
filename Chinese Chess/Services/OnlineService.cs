@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Firebase.Database.Streaming;
 using Firebase.Database.Offline;
+using System.Windows;
 
 public class GameState
 {
@@ -30,9 +31,11 @@ namespace Chinese_Chess.Services
         public event Action<string> OnMoveReceived;
         public event Action<string> OnChatReceived;
 
+
         private IDisposable _matchListener;
         private IDisposable _moveListener;
         private IDisposable _chatListener;
+        public string OpponentName { get; private set; } = "Unknown";
 
         private string _myMatchmakingId;
         private bool _isMatchFound = false;
@@ -59,6 +62,7 @@ namespace Chinese_Chess.Services
                 {
                     // --- JOINER (BLACK) ---
                     Debug.WriteLine($"[OnlineService] Tìm thấy đối thủ: {opponent.Object.Name}");
+                    OpponentName = opponent.Object.Name;
                     MySide = "BLACK";
                     string gameId = Guid.NewGuid().ToString().Substring(0, 8);
 
@@ -78,8 +82,8 @@ namespace Chinese_Chess.Services
                     StartPollingGame(gameId);
                     // Delay một chút để đảm bảo listeners đã bắt đầu
                     await Task.Delay(500);
-                    
-                    OnGameStarted?.Invoke(gameId);
+
+                    Application.Current.Dispatcher.Invoke(() => OnGameStarted?.Invoke(gameId));
                 }
                 else
                 {
@@ -106,14 +110,14 @@ namespace Chinese_Chess.Services
                                     _isMatchFound = true;
                                     CurrentGameId = d.Object.GameId;
                                     Debug.WriteLine($"[OnlineService] Đối thủ đã vào! GameID: {CurrentGameId}");
-
+                                    await GetOpponentNameFromGameInfo(CurrentGameId, "RED");
                                     DeleteMyMatchRequestSafe();
                                     // ✅ KỚI ĐỘNG LISTENERS NGAY LẬP TỨC
                                     //StartListeningToGame(CurrentGameId);
                                     StartPollingGame(CurrentGameId);
                                     await Task.Delay(500);
 
-                                    OnGameStarted?.Invoke(CurrentGameId);
+                                    Application.Current.Dispatcher.Invoke(() => OnGameStarted?.Invoke(CurrentGameId));
                                 }
                             }
                             catch (Exception ex) { Debug.WriteLine($"[MatchListener Error] {ex.Message}"); }
@@ -124,6 +128,23 @@ namespace Chinese_Chess.Services
             {
                 Debug.WriteLine($"[Lỗi FindMatch] {ex.Message}");
                 throw;
+            }
+        }
+
+        private async Task GetOpponentNameFromGameInfo(string gameId, string mySide)
+        {
+            try
+            {
+                var game = await _firebase.Child("games").Child(gameId).OnceSingleAsync<GameState>();
+                if (game != null)
+                {
+                    OpponentName = (mySide == "RED") ? game.BlackPlayer : game.RedPlayer;
+                    Debug.WriteLine($"[Info] Đối thủ là: {OpponentName}");
+                }
+            }
+            catch
+            {
+                OpponentName = "Opponent";
             }
         }
 
@@ -199,7 +220,7 @@ namespace Chinese_Chess.Services
             if (senderSide == MySide) return; // Ignore own echo
 
             _lastProcessedMove = moveData;
-            OnMoveReceived?.Invoke(moveStr);
+            Application.Current.Dispatcher.Invoke(() => OnMoveReceived?.Invoke(parts[1]));
         }
 
         private bool _isPolling = false;
@@ -231,16 +252,33 @@ namespace Chinese_Chess.Services
                             .OnceSingleAsync<GameState>()
                             .ConfigureAwait(false);
 
-                        if (gameState != null && !string.IsNullOrEmpty(gameState.LastMove))
+                        if (gameState != null)
                         {
-                            Debug.WriteLine($"[POLLING DATA] LastMove: {gameState.LastMove}");
+                            if (!string.IsNullOrEmpty(gameState.LastMove))
+                            {
+                                Debug.WriteLine($"[POLLING DATA] LastMove: {gameState.LastMove}");
+                                // 3. Process the move (Requires Dispatcher for UI)
+                                HandleIncomingMove(gameState.LastMove);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[POLLING] LastMove is empty.");
+                            }
 
-                            // 3. Process the move (Requires Dispatcher for UI)
-                            HandleIncomingMove(gameState.LastMove);
+                            if (!string.IsNullOrEmpty(gameState.LastChat))
+                            {
+                                Debug.WriteLine($"[POLLING DATA] LastChat: {gameState.LastChat}");
+                                HandleIncomingChat(gameState.LastChat);
+
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[POLLING] LastChat is empty.");
+                            }
                         }
                         else
                         {
-                            Debug.WriteLine("[POLLING] Game state or LastMove is empty.");
+                            Debug.WriteLine("[POLLING] Game state is empty");
                         }
                     }
                     catch (Exception ex)
@@ -249,9 +287,46 @@ namespace Chinese_Chess.Services
                         Debug.WriteLine($"[POLLING EXCEPTION] {ex.GetType().Name}: {ex.Message}");
                     }
 
-                    await Task.Delay(2000);
+                    await Task.Delay(1500);
                 }
             });
+        }
+
+        private void HandleIncomingChat(string chatStr)
+        {
+            try
+            {
+                // 1. Bỏ qua nếu dữ liệu rỗng hoặc là chuỗi khởi tạo "INIT"
+                if (string.IsNullOrEmpty(chatStr) || chatStr == "INIT") return;
+
+                // 2. QUAN TRỌNG: Kiểm tra trùng lặp
+                // Vì Polling chạy liên tục 2s/lần nên nó sẽ lấy lại tin cũ nhiều lần.
+                // Nếu tin nhắn này đã xử lý rồi thì bỏ qua ngay.
+                if (chatStr == _lastProcessedChat) return;
+
+                // Cập nhật biến này để lần poll sau biết là đã xử lý rồi
+                _lastProcessedChat = chatStr;
+
+                // 3. Tách chuỗi theo định dạng "SIDE|Name:Message"
+                var parts = chatStr.Split(new[] { '|' }, 2);
+                if (parts.Length < 2) return;
+
+                string senderSide = parts[0];   // Ví dụ: "RED"
+                string content = parts[1];      // Ví dụ: "S1mpleLuv:Alo"
+
+                // 4. Chỉ bắn sự kiện nếu người gửi KHÁC phe mình (nghĩa là đối thủ)
+                if (senderSide != MySide)
+                {
+                    Debug.WriteLine($"[POLLING CHAT] Nhận tin mới: {content}");
+
+                    // Bắn sự kiện để GameViewModel hứng và hiển thị lên UI
+                    Application.Current.Dispatcher.Invoke(() => OnChatReceived?.Invoke(parts[1]));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[HandleIncomingChat Error] {ex.Message}");
+            }
         }
 
         private void StartListeningToGame(string gameId)
