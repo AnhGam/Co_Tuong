@@ -23,7 +23,7 @@ namespace Chinese_Chess.ViewModels
         public ObservableCollection<Piece> Pieces { get; set; }
         public BoardState BoardLogic { get; set; }
         private Stack<Move> _redoStack = new Stack<Move>();
-
+        public bool IsGameFinished { get; private set; } = false;
         public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new ObservableCollection<ChatMessage>();
         public ObservableCollection<HighlightSpot> ValidMoves { get; set; } = new ObservableCollection<HighlightSpot>();
         public ObservableCollection<Piece> CapturedRedPieces { get; set; } = new ObservableCollection<Piece>();
@@ -60,7 +60,7 @@ namespace Chinese_Chess.ViewModels
         private string _botName = "Bot";
         public string BotName { get => _botName; set { _botName = value; OnPropertyChanged(); } }
 
-        private string _botAvatar;
+        private string _botAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
         public string BotAvatar { get => _botAvatar; set { _botAvatar = value; OnPropertyChanged(); } }
 
         public string PlayerName => AppSettings.PlayerName;
@@ -85,7 +85,7 @@ namespace Chinese_Chess.ViewModels
                 RefreshPieceImages();
             };
 
-            //StartNewGame();
+            StartNewGame();
         }
 
         // --- START GAME ---
@@ -103,11 +103,13 @@ namespace Chinese_Chess.ViewModels
             GameStatus = "Lượt Đỏ";
             IsMyTurn = true;
             IsOnline = false;
+            IsGameFinished = false;
             BoardRotation = 0;
 
             InitBotInfo();
             InitStandardBoard();
             BoardLogic.Pieces = Pieces.ToList();
+            RefreshPieceImages();
             AddToChat("Trò chơi bắt đầu!", MessageType.System);
         }
 
@@ -141,6 +143,8 @@ namespace Chinese_Chess.ViewModels
             // ✅ Reset bàn cờ
             StartNewGame();
             IsOnline = true; // Set lại vì StartNewGame reset nó về false
+            BotName = _onlineService.OpponentName;
+            BotAvatar = "pack://application:,,,/Chinese Chess;component/Assets/bot.png";
 
             // ✅ Setup Phe
             if (_onlineService.MySide == "RED")
@@ -168,44 +172,85 @@ namespace Chinese_Chess.ViewModels
         // XỬ LÝ NHẬN MOVE
         private void HandleOnlineMove(string moveStr)
         {
-            Debug.WriteLine($"[GameViewModel] -> Đã nhận lệnh đi quân từ mạng: {moveStr}");
-
-            var parts = moveStr.Split(',');
-            if (parts.Length < 4) return;
-
-            int fx = int.Parse(parts[0]);
-            int fy = int.Parse(parts[1]);
-            int tx = int.Parse(parts[2]);
-            int ty = int.Parse(parts[3]);
-
-            // Dùng Dispatcher để update UI
             Application.Current.Dispatcher.Invoke(() =>
             {
                 try
                 {
-                    Piece piece = BoardLogic.GetPieceAt(fx, fy);
-                    if (piece == null)
+                    // 1. SURRENDER
+                    if (moveStr == "SURRENDER")
                     {
-                        Debug.WriteLine($"[LỖI] Không tìm thấy quân tại {fx},{fy} để đi!");
+                        StopGame();
+                        GameStatus = "ĐỐI THỦ ĐẦU HÀNG!";
+                        OnGameEnded?.Invoke("OPPONENT_SURRENDER"); 
                         return;
                     }
 
-                    var target = BoardLogic.GetPieceAt(tx, ty);
-                    var move = new Move(piece, fx, fy, tx, ty);
+                    // 2. DRAW REQUEST
+                    if (moveStr == "DRAW_REQUEST")
+                    {
+                        bool accept = Views.MessageBox.Show($"{_onlineService.OpponentName} xin hòa. Đồng ý?", "CẦU HÒA", "Đồng ý", "Từ chối");
+                        if (accept)
+                        {
+                            _onlineService.SendMove("DRAW_ACCEPT");
+                            EndGameAsDraw();
+                        }
+                        else
+                        {
+                            _onlineService.SendMove("DRAW_REFUSE");
+                        }
+                        return;
+                    }
 
-                    Debug.WriteLine($"[GameViewModel] Thực hiện move: {piece.Type} to {tx},{ty}");
-                    ExecuteMove(move, target);
+                    if (moveStr == "DRAW_ACCEPT") { EndGameAsDraw();  return; }
+                    if (moveStr == "DRAW_REFUSE") { Views.MessageBox.Show("Đối thủ từ chối hòa.", "THÔNG BÁO"); return; }
 
-                    // Cập nhật lượt
-                    IsMyTurn = true;
-                    AudioHelper.PlaySFX("Play.mp3");
-                    CheckGameState();
+                    // 3. MOVE
+                    var parts = moveStr.Split(',');
+                    if (parts.Length < 4) return;
+                    int fx = int.Parse(parts[0]), fy = int.Parse(parts[1]);
+                    int tx = int.Parse(parts[2]), ty = int.Parse(parts[3]);
+
+                    var piece = BoardLogic.GetPieceAt(fx, fy);
+                    if (piece != null)
+                    {
+                        var target = BoardLogic.GetPieceAt(tx, ty);
+                        var move = new Move(piece, fx, fy, tx, ty);
+                        ExecuteMove(move, target);
+                        IsMyTurn = true;
+                        CheckGameState();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[LỖI] HandleOnlineMove Exception: {ex.Message}");
-                }
+                catch (Exception ex) { Debug.WriteLine($"[Move Error] {ex.Message}"); }
             });
+        }
+        public async void RequestDraw()
+        {
+            if (!IsOnline || (GameStatus != null && (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA")))) return;
+
+            bool confirm = Views.MessageBox.Show(
+                "Bạn muốn gửi yêu cầu HÒA cho đối thủ?",
+                "Xác nhận",
+                "Gửi yêu cầu",
+                "Hủy");
+
+            if (confirm)
+            {
+                await _onlineService.SendMove("DRAW_REQUEST");
+                AddToChat("Đã gửi yêu cầu cầu hòa...", MessageType.System);
+            }
+        }
+
+        private async void SendDrawResponse(string response)
+        {
+            if (IsOnline) await _onlineService.SendMove(response);
+        }
+
+        private void EndGameAsDraw()
+        {
+            GameStatus = "VÁN ĐẤU HÒA";
+            AddToChat("Hai bên đã đồng ý HÒA.", MessageType.System);
+            StopGame();
+            OnGameEnded?.Invoke("DRAW");
         }
 
         // XỬ LÝ NHẬN CHAT
@@ -227,7 +272,7 @@ namespace Chinese_Chess.ViewModels
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                AddToChat(msg, MessageType.Player, senderSide);
+                AddToChat(msg, MessageType.Bot, senderSide);
             });
         }
 
@@ -248,6 +293,7 @@ namespace Chinese_Chess.ViewModels
 
         public async void OnTileClicked(int x, int y)
         {
+            if (IsGameFinished) return;
             if (IsOnline && !IsMyTurn)
             {
                 Debug.WriteLine("[GameViewModel] Click chặn: Chưa đến lượt.");
@@ -311,28 +357,35 @@ namespace Chinese_Chess.ViewModels
         {
             var nextTurn = BoardLogic.CurrentTurn;
             GameStatus = (nextTurn == PieceColor.Red) ? "Lượt Đỏ" : "Lượt Đen";
-
-            bool canMove = MoveValidator.HasAnyValidMove(BoardLogic, nextTurn);
-            if (!canMove)
+            if (!MoveValidator.HasAnyValidMove(BoardLogic, nextTurn))
             {
-                string winner = (nextTurn == PieceColor.Red ? "ĐEN" : "ĐỎ");
-                GameStatus = $"HẾT CỜ! {winner} THẮNG";
-                AddToChat($"KẾT THÚC: {winner} CHIẾN THẮNG!", MessageType.System);
+                string winnerSide = (nextTurn == PieceColor.Red) ? "ĐEN" : "ĐỎ";
+
+                string resultSignal = "";
+
+                if (IsOnline)
+                {
+                    if (_onlineService.MySide == "RED") resultSignal = (winnerSide == "ĐEN") ? "LOSE" : "WIN";
+                    else resultSignal = (winnerSide == "ĐỎ") ? "LOSE" : "WIN";
+                }
+                else
+                {
+                    resultSignal = (winnerSide == "ĐEN") ? "LOSE" : "WIN";
+                }
+
+                GameStatus = $"HẾT CỜ! {winnerSide} THẮNG";
+                IsGameFinished = true;
                 StopGame();
-                OnGameEnded?.Invoke(winner);
-                return;
+                OnGameEnded?.Invoke(resultSignal);
             }
-
-            if (MoveValidator.IsInCheck(BoardLogic, nextTurn))
-            {
-                GameStatus = "CHIẾU TƯỚNG!";
-            }
+            else if (MoveValidator.IsInCheck(BoardLogic, nextTurn)) GameStatus = "CHIẾU TƯỚNG!";
         }
 
         // --- HELPERS ---
 
         private async void TriggerBotTurn()
         {
+            if( IsGameFinished) return; 
             if (GameStatus.Contains("THẮNG")) return;
 
             int delayTime = (Difficulty == 3) ? 1000 : 500;
@@ -466,23 +519,31 @@ namespace Chinese_Chess.ViewModels
 
         public void StopGame()
         {
-            if (IsOnline) return;
-            _botService.StopEngine();
+            IsGameFinished = true;
+            if (!IsOnline) _botService.StopEngine();
         }
 
-        public void Surrender()
+        public async void Surrender()
         {
-            if (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA")) return;
-            GameStatus = "ĐEN THẮNG (Đầu hàng)";
-            AddToChat("Người chơi đã đầu hàng.", MessageType.System);
+            if( IsGameFinished) return;
+            if (GameStatus != null && (GameStatus.Contains("THẮNG") || GameStatus.Contains("HÒA") || GameStatus.Contains("THUA"))) return;
+
+            if (IsOnline)
+            {
+                await _onlineService.SendMove("SURRENDER");
+            }
+
+            GameStatus = "BẠN ĐÃ ĐẦU HÀNG";
+            AddToChat("Bạn đã đầu hàng.", MessageType.System);
+            IsGameFinished = true;
             StopGame();
+            OnGameEnded?.Invoke("SELF_SURRENDER");
         }
 
         // --- UNDO / REDO / SAVE / LOAD ---
         public void Undo()
         {
-            if (IsOnline) return;
-            if (BoardLogic.CurrentTurn == PieceColor.Black) return;
+            if (IsOnline && !IsGameFinished) return;
             int steps = (BoardLogic.Moves.Count < 2) ? 1 : 2;
             for (int i = 0; i < steps; i++)
             {
@@ -503,7 +564,7 @@ namespace Chinese_Chess.ViewModels
 
         public void Redo()
         {
-            if (IsOnline) return;
+            if (IsOnline && !IsGameFinished) return;
             if (_redoStack.Count == 0) return;
 
             while (_redoStack.Count > 0)

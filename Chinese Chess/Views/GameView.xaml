@@ -187,12 +187,31 @@
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="Draw_offer" Background="Transparent" BorderThickness="0" 
-                            IsEnabled="False" Opacity="0.5" 
-                            ToolTip="Bot chưa được cài đặt tính năng cầu hòa">
-                        <StackPanel>
-                            <Image Source="/Assets/Button/draw10.png" Height="30" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Cầu hòa" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                    <Button x:Name="Draw_offer" Margin="10,0" 
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                    Click="DrawButton_Click">
+
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="IsEnabled" Value="False"/>
+                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="ToolTip" Value="Bot chưa hỗ trợ cầu hòa"/>
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Setter Property="Opacity" Value="1.0"/>
+                                        <Setter Property="ToolTip" Value="Gửi yêu cầu cầu hòa"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <Image Source="/Assets/Button/draw10.png" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            <TextBlock Text="Cầu hòa" FontSize="12" FontWeight="SemiBold" 
+                                               HorizontalAlignment="Center" Margin="0,2,0,0"
+                                               Foreground="Black"/>
                         </StackPanel>
                     </Button>
 

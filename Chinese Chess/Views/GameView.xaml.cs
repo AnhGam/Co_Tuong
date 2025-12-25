@@ -18,6 +18,7 @@ namespace Chinese_Chess.Views
         bool isPaused = false;
         bool isMuted = false;
         bool _isGameFinished = false;
+        bool _isNavigatingToSettings = false;
         public GameView()
         {
             InitializeComponent();
@@ -25,23 +26,48 @@ namespace Chinese_Chess.Views
             // KẾT NỐI VIEWMODEL 
             var viewModel = new GameViewModel();
             this.DataContext = viewModel;
-            viewModel.OnGameEnded += (winner) =>
+            viewModel.OnGameEnded += (resultSignal) =>
             {
+
+                if (_isGameFinished) return;
                 _isGameFinished = true;
-                ClearAutoSave();
-                string message = (winner == "ĐỎ") ? "XUẤT SẮC! Bạn đã chiến thắng Bot!" : "HẾT CỜ! Bạn đã thua cuộc.";
+                gameTimer.Stop();
+                string msg = "";
+                string title = "KẾT THÚC";
+                switch (resultSignal)
+                {
+                    case "DRAW":
+                        msg = "Ván đấu HÒA! Không có người chiến thắng";
+                        break;
+                    case "WIN":
+                        msg = viewModel.IsOnline ? "Bạn đã chiến thắng" : "Bạn đã chiến thắng Bot!";
+                        title = "CHIẾN THẮNG";
+                        break;
+                    case "OPPONENT_SURRENDER": 
+                        msg = viewModel.IsOnline ? "Đối phương đã đầu hàng!" : "";
+                        title = "CHIẾN THẮNG";
+                        break;
+                    case "LOSE":
+                        msg = viewModel.IsOnline ? "BẠN ĐÃ THUA! Hết đường đi." : "HẾT CỜ! Bạn đã thua một con Bot.";
+                        title = "THẤT BẠI";
+                        break;
+                    case "SELF_SURRENDER": 
+                        msg = viewModel.IsOnline ? "Bạn đã đầu hàng!" : " Bạn đã đầu hàng một con bot.";
+                        title = "THẤT BẠI";
+                        break;
+                    default:
+                        if (resultSignal == "ĐỎ" || resultSignal == "RED") msg = "ĐỎ THẮNG!";
+                        else msg = "ĐEN THẮNG!";
+                        break;
+                }
                 bool reviewGame = MessageBox.Show(
-                    message + "\nBạn muốn làm gì tiếp theo?",
+                    msg + "\nBạn muốn làm gì tiếp theo?",
                     "KẾT THÚC",
                     "Xem lại ván đấu", 
                     "Về Menu Chính");  
 
-                if (reviewGame){}
-                else
-                {
-                    Window mainWindow = Window.GetWindow(this);
-                    if (mainWindow != null) mainWindow.Content = new MainMenuView();
-                }
+                if (!reviewGame) QuitToMainMenu();
+               
             };
             viewModel.OnGameLoaded += (savedTime) =>
             {
@@ -81,6 +107,11 @@ namespace Chinese_Chess.Views
         // Khi thoát ra -> Ngừng theo dõi 
         private void GameView_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (_isNavigatingToSettings)
+            {
+                _isNavigatingToSettings = false; 
+                return;
+            }
             Window window = Window.GetWindow(this);
             if (window != null)
             {
@@ -175,7 +206,7 @@ namespace Chinese_Chess.Views
             }
             isPaused = !isPaused;
             AudioHelper.PauseBGM(isPaused);
-            if (isPaused)
+            if (isPaused && !_isGameFinished)
             {
                 gameTimer.Stop();
                 try
@@ -231,22 +262,37 @@ namespace Chinese_Chess.Views
             bool wasPaused = isPaused; 
             isPaused = true;
             gameTimer.Stop();
+            var vm = this.DataContext as GameViewModel;
+            bool result;
             // (éo biết bị gì những cần đưa vào title và message ngược nhau mới đúng)
-            bool result = (this.DataContext as GameViewModel).IsOnline?MessageBox.Show(
-                "Mọi tiến độ trong trò chơi sẽ được lưu vào lần chơi kế tiếp.",
-                "Thoát ra màn hình chính?",
-                "Đồng ý",
-                "Hủy"): MessageBox.Show("Thoát ra sẽ tính như bạn đầu hàng", "Thoát ra màn hình chính?", "Đồng ý", "Hủy");
-
-            if (result) 
+            if (vm.IsGameFinished)
             {
-                if (this.DataContext is GameViewModel vm)
+                result = MessageBox.Show("Bạn muốn thoát ra màn hình chính?", "Thoát ra", "Đồng ý", "Hủy");
+            }
+            else
+            {
+                result = vm.IsOnline ? MessageBox.Show("Thoát ra sẽ tính như bạn đầu hàng", "Thoát ra màn hình chính?", "Đồng ý", "Hủy") :
+                    MessageBox.Show(
+                    "Mọi tiến độ trong trò chơi sẽ được lưu vào lần chơi kế tiếp.",
+                    "Thoát ra màn hình chính?",
+                    "Đồng ý",
+                    "Hủy");
+            }
+            if (result)
+            {
+                if (vm.IsOnline && vm.GameStatus != null && !vm.GameStatus.Contains("THẮNG"))
+                {
+                    if (vm.IsGameFinished) QuitToMainMenu();
+                    else vm.Surrender();
+                }
+                else if (!vm.IsOnline)
                 {
                     vm.SaveGame(timeInSeconds, "autosave.json");
+                    QuitToMainMenu();
                 }
-                QuitToMainMenu();
+                
             }
-            else 
+            else
             {
                 if (!wasPaused)
                 {
@@ -260,6 +306,7 @@ namespace Chinese_Chess.Views
         {
             Window mainWindow = Window.GetWindow(this);
             SettingsView settingsScreen = new SettingsView();
+            _isNavigatingToSettings = true;
             settingsScreen.OnCloseRequest += () =>
             {
                 if (mainWindow != null)
@@ -283,11 +330,9 @@ namespace Chinese_Chess.Views
             if (mainWindow != null) mainWindow.Content = new MainMenuView();
         }
         private void Backward_Click(object sender, RoutedEventArgs e) {
-            if(_isGameFinished)
                 (this.DataContext as GameViewModel).Undo(); 
         }
         private void Forward_Click(object sender, RoutedEventArgs e) { 
-            if(_isGameFinished)
                 (this.DataContext as GameViewModel)?.Redo(); 
         }
         private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -322,6 +367,7 @@ namespace Chinese_Chess.Views
 
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            if(_isGameFinished) return;
             bool confirmSurrender = MessageBox.Show(
                 "Bạn có chắc chắn muốn đầu hàng?",
                 "Xác nhận",
@@ -333,7 +379,6 @@ namespace Chinese_Chess.Views
             var vm = this.DataContext as GameViewModel;
             vm?.Surrender();
             _isGameFinished = true;
-            ClearAutoSave();
             isPaused = true;
             gameTimer.Stop();
 
@@ -349,6 +394,21 @@ namespace Chinese_Chess.Views
                 QuitToMainMenu();
             }
         }
+
+        private void DrawButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isGameFinished) return;
+            if (this.DataContext is GameViewModel vm)
+            {
+                if (!vm.IsOnline)
+                {
+                    MessageBox.Show("Chức năng cầu hòa chỉ dành cho chế độ Online!", "Thông báo");
+                    return;
+                }
+                vm.RequestDraw();
+            }
+        }
+
         private void ClearAutoSave()
         {
             if (System.IO.File.Exists("autosave.json"))
