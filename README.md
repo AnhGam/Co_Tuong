@@ -3,7 +3,7 @@
 ## Giới thiệu
 Đây là đồ án cuối kỳ cho môn học **Lập Trình Trực Quan (IT008)** tại **Trường Đại học Công nghệ Thông tin - ĐHQG TP.HCM (UIT)**.
 
-Dự án là một ứng dụng Cờ Tướng (Chinese Chess) được xây dựng trên nền tảng **.NET (C#)** sử dụng **WPF (Windows Presentation Foundation)**. Ứng dụng tập trung vào việc áp dụng kiến trúc MVVM để quản lý trạng thái game , tích hợp Engine AI và xử lý đồng bộ dữ liệu thời gian thực cho tính năng chơi trực tuyến.
+Dự án là một ứng dụng Cờ Tướng (Chinese Chess) được xây dựng trên nền tảng **.NET (C#)** sử dụng **WPF (Windows Presentation Foundation)**. Ứng dụng tập trung vào việc áp dụng kiến trúc MVVM để quản lý trạng thái game, tích hợp Engine AI và xử lý đồng bộ dữ liệu thời gian thực cho tính năng chơi trực tuyến.
 
 ## Tính năng chính
 
@@ -16,7 +16,7 @@ Dự án là một ứng dụng Cờ Tướng (Chinese Chess) được xây dự
 - **Hạ tầng Backend:** Sử dụng **Firebase Realtime Database** làm máy chủ trung gian.
 - **Cơ chế hoạt động:**
     - **Matchmaking:** Hệ thống tạo phòng và ghép cặp người chơi tự động hoặc theo ID phòng.
-    - **Data Sync:** Đồng bộ hóa nước đi (FEN string), trạng thái bàn cờ và tín hiệu điều khiển (cầu hòa, xin thua) theo thời gian thực .
+    - **Data Sync:** Đồng bộ hóa nước đi (FEN string), trạng thái bàn cờ và tín hiệu điều khiển (cầu hòa, xin thua) theo thời gian thực.
     - **Chat System:** Tích hợp khung chat trực tuyến giữa hai người chơi trong thời gian thực.
 
 ### 3. Giao diện & Trải nghiệm (UI/UX)
@@ -56,7 +56,7 @@ Dự án là một ứng dụng Cờ Tướng (Chinese Chess) được xây dự
 
 **Đồ án môn học IT008 - UIT**
 * **Nguyễn Minh Anh** - [AnhGam](https://github.com/AnhGam)
-* **Dương Nguyễn Phú Quý** -[QusyPlus](https://github.com/QusyPlus)
+* **Dương Nguyễn Phú Quý** - [QusyPlus](https://github.com/QusyPlus)
 
 ---
 *Lưu ý: Dự án sử dụng Pikafish engine tuân theo giấy phép GPLv3. Vui lòng tham khảo file LICENSE trong thư mục Engine để biết thêm chi tiết.*
