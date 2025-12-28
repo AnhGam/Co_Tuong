@@ -10,9 +10,10 @@
     <UserControl.Resources>
         <local:BoardCoordinateConverter x:Key="PosConverter"/>
         <local:BoolToVisibilityConverter x:Key="VisConverter"/>
+
         <Style x:Key="ModernScrollBarStyle" TargetType="ScrollBar">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Width" Value="1"/>
+            <Setter Property="Width" Value="5"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
@@ -23,15 +24,15 @@
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
                                                 <Border x:Name="ThumbBorder" 
-                                                    Background="#CCC" 
-                                                    CornerRadius="4" 
-                                                    Margin="1,0"/>
+                                                        Background="{DynamicResource BorderBrush}" 
+                                                        CornerRadius="4" 
+                                                        Margin="1,0"/>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="#A1887F"/>
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource PrimaryBrush}"/>
                                                     </Trigger>
                                                     <Trigger Property="IsDragging" Value="True">
-                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="#8D6E63"/>
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource PrimaryBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -56,6 +57,7 @@
                 <ColumnDefinition Width="670"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+
             <Button x:Name="GoBackButton" Grid.Row="0" 
                     HorizontalAlignment="Left" Width="35" Height="31"
                     Background="Transparent" BorderThickness="0" 
@@ -69,55 +71,46 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
                 <Label x:Name="GameTimerLabel" Content="00:00" Grid.Row="0" 
-                       FontSize="20" FontWeight="Bold" 
-                       HorizontalAlignment="Center" VerticalAlignment="Top"
-                       Margin="0,0,0,0"/>
-
+                        FontSize="20" FontWeight="Bold" 
+                        Foreground="{DynamicResource TextDarkBrush}" 
+                        HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
                 <Viewbox Grid.Row="1" Stretch="Uniform" Margin="0,5">
                     <Grid x:Name="BoardContainer" Width="600" Height="640" RenderTransformOrigin="0.5,0.5">
-
                         <Grid.RenderTransform>
                             <RotateTransform Angle="{Binding BoardRotation}"/>
                         </Grid.RenderTransform>
-
                         <Image x:Name="BoardImage" Source="/Assets/XiangquiBoard.png" Stretch="Fill"/>
-
                         <ItemsControl ItemsSource="{Binding Pieces}" Width="600" Height="640">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas x:Name="BoardCanvas" Background="Transparent" MouseDown="BoardCanvas_MouseDown"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="Canvas.Left" Value="{Binding X, Converter={StaticResource PosConverter}, ConverterParameter=X}"/>
                                     <Setter Property="Canvas.Top" Value="{Binding Y, Converter={StaticResource PosConverter}, ConverterParameter=Y}"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
-
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Visibility="{Binding IsAlive, Converter={StaticResource VisConverter}}">
                                         <Ellipse Width="55" Height="55" Stroke="Yellow" StrokeThickness="3" 
-                                     HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
-                                     Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
+                                                 HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2.5,-2.5,0,0"
+                                                 Visibility="{Binding IsSelected, Converter={StaticResource VisConverter}}">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="5"/>
                                             </Ellipse.Effect>
                                         </Ellipse>
-
                                         <Image Source="{Binding ImagePath}" Width="50" Height="50" Cursor="Hand"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   RenderTransformOrigin="0.5,0.5">
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               RenderTransformOrigin="0.5,0.5">
                                             <Image.RenderTransform>
                                                 <RotateTransform Angle="{Binding DataContext.BoardRotation, ElementName=Root}"/>
                                             </Image.RenderTransform>
                                         </Image>
-
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -139,7 +132,7 @@
                                 <DataTemplate>
                                     <Grid Width="60" Height="60" Margin="-5,-5,0,0">
                                         <Ellipse Width="30" Height="30" Fill="#BF94E4" Opacity="0.4" 
-                                     HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <Ellipse.Effect>
                                                 <BlurEffect Radius="8"/>
                                             </Ellipse.Effect>
@@ -148,24 +141,25 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-
                     </Grid>
                 </Viewbox>
-                
+
                 <UniformGrid x:Name="ControlBarPanel" Grid.Row="2" Rows="1" Width="600" 
                              HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
 
                     <Button x:Name="Backward" Background="Transparent" BorderThickness="0" Click="Backward_Click">
                         <StackPanel>
                             <Image Source="/Assets/Button/backward1.png" Height="30" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Lùi lại" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="Lùi lại" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="Pause" Background="Transparent" BorderThickness="0" Click="Pause_Click">
                         <StackPanel>
                             <Image x:Name="Pause_icon" Source="/Assets/Button/pause1.png" Height="30" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Tạm dừng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="Tạm dừng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0" 
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
 
@@ -176,51 +170,38 @@
                                     <ScaleTransform ScaleX="-1"/>
                                 </Image.RenderTransform>
                             </Image>
-                            <TextBlock Text="Đi tiếp" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="Đi tiếp" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0" 
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="New_Game" Background="Transparent" BorderThickness="0" Click="New_Game_Click">
                         <StackPanel>
                             <Image Source="/Assets/Button/renew1.png" Height="30" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Ván mới" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="Ván mới" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0" 
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="Draw_offer" Margin="10,0" 
-                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                    Click="DrawButton_Click">
-
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="IsEnabled" Value="False"/>
-                                <Setter Property="Opacity" Value="0.5"/>
-                                <Setter Property="ToolTip" Value="Bot chưa hỗ trợ cầu hòa"/>
-
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOnline}" Value="True">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                        <Setter Property="Opacity" Value="1.0"/>
-                                        <Setter Property="ToolTip" Value="Gửi yêu cầu cầu hòa"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            Click="DrawButton_Click">
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                             <Image Source="/Assets/Button/draw10.png" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality"/>
                             <TextBlock Text="Cầu hòa" FontSize="12" FontWeight="SemiBold" 
-                                               HorizontalAlignment="Center" Margin="0,2,0,0"
-                                               Foreground="Black"/>
+                                       HorizontalAlignment="Center" Margin="0,2,0,0"
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="Surrender" Background="Transparent" BorderThickness="0" Click="SurrenderButton_Click">
                         <StackPanel>
                             <Image Source="/Assets/Button/surrender10.png" Height="30" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Đầu hàng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="Đầu hàng" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0" 
+                                       Foreground="Black"/>
                         </StackPanel>
                     </Button>
+
                 </UniformGrid>
             </Grid>
 
@@ -242,14 +223,16 @@
 
                 <StackPanel x:Name="SidePanel" Grid.Row="1" VerticalAlignment="Center">
 
-                    <Border x:Name="Player1Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" CornerRadius="10">
+                    <Border x:Name="Player1Card" Height="140" Margin="0,0,0,15" 
+                            Background="{DynamicResource CardBackgroundBrush}" 
+                            CornerRadius="10">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="#DDD"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                                        <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
@@ -273,10 +256,10 @@
                             </Grid.ColumnDefinitions>
                             <Image x:Name="Player1_avatar" Source="{Binding BotAvatar}" Width="70" Height="70" VerticalAlignment="Top"/>
                             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                <TextBlock Text="{Binding BotName}" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text="{Binding BotName}" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextDarkBrush}"/>
                             </StackPanel>
                             <WrapPanel x:Name="P1CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
-                                <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Đã ăn: " Foreground="{DynamicResource TextGrayBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                 <ItemsControl ItemsSource="{Binding CapturedRedPieces}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -293,14 +276,16 @@
                         </Grid>
                     </Border>
 
-                    <Border x:Name="Player2Card" Height="140" Margin="0,0,0,15" Background="#FDF8F0" CornerRadius="10">
+                    <Border x:Name="Player2Card" Height="140" Margin="0,0,0,15" 
+                            Background="{DynamicResource CardBackgroundBrush}" 
+                            CornerRadius="10">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="#DDD"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                                        <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
@@ -324,10 +309,10 @@
                             </Grid.ColumnDefinitions>
                             <Image x:Name="Player2_avatar" Source="{Binding PlayerAvatar}" Width="70" Height="70" VerticalAlignment="Top"/>
                             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                                <TextBlock x:Name="Player2_name" Text="{Binding PlayerName}" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock x:Name="Player2_name" Text="{Binding PlayerName}" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextDarkBrush}"/>
                             </StackPanel>
                             <WrapPanel x:Name="P2CapturedList" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="0,5,0,0">
-                                <TextBlock Text="Đã ăn: " Foreground="Silver" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Đã ăn: " Foreground="{DynamicResource TextGrayBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                 <ItemsControl ItemsSource="{Binding CapturedBlackPieces}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -344,9 +329,12 @@
                         </Grid>
                     </Border>
 
-                    <Border x:Name="ChatBoxCard" Height="220" Background="#FDF8F0" BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
+                    <Border x:Name="ChatBoxCard" Height="220" 
+                            Background="{DynamicResource CardBackgroundBrush}" 
+                            BorderBrush="{DynamicResource BorderBrush}" 
+                            BorderThickness="1" CornerRadius="10">
                         <Border.Effect>
-                            <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                            <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
                         </Border.Effect>
 
                         <Grid>
@@ -366,15 +354,14 @@
                                                 <Border x:Name="Bubble" Padding="10,6" CornerRadius="8" MaxWidth="200">
                                                     <StackPanel>
                                                         <TextBlock x:Name="SenderName" Text="{Binding Sender}" 
-                                                        FontSize="9" Foreground="Gray" Margin="0,0,0,2" Visibility="Collapsed"/>
+                                                                   FontSize="9" Foreground="Gray" Margin="0,0,0,2" Visibility="Collapsed"/>
 
-                                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13"/>
-
+                                                        <TextBlock x:Name="MessageText" Text="{Binding Text}" TextWrapping="Wrap" FontSize="13" Foreground="Black"/>
                                                         <TextBlock Text="{Binding TimeDisplay}" 
-                                                           FontSize="9" 
-                                                           Foreground="#888" 
-                                                           HorizontalAlignment="Right" 
-                                                           Margin="5,2,0,0"/>
+                                                                   FontSize="9" 
+                                                                   Foreground="#888" 
+                                                                   HorizontalAlignment="Right" 
+                                                                   Margin="5,2,0,0"/>
                                                     </StackPanel>
                                                 </Border>
                                             </Grid>
@@ -385,13 +372,15 @@
                                                     <Setter TargetName="Bubble" Property="Background" Value="#DCF8C6"/>
                                                     <Setter TargetName="Bubble" Property="BorderBrush" Value="#C4E1A4"/>
                                                     <Setter TargetName="Bubble" Property="BorderThickness" Value="1"/>
+                                                    <Setter TargetName="MessageText" Property="Foreground" Value="Black"/>
                                                 </DataTrigger>
 
                                                 <DataTrigger Binding="{Binding Type}" Value="Bot">
                                                     <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Left"/>
-                                                    <Setter TargetName="Bubble" Property="Background" Value="White"/>
-                                                    <Setter TargetName="Bubble" Property="BorderBrush" Value="#DDD"/>
+                                                    <Setter TargetName="Bubble" Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+                                                    <Setter TargetName="Bubble" Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                                     <Setter TargetName="Bubble" Property="BorderThickness" Value="1"/>
+                                                    <Setter TargetName="MessageText" Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
                                                     <Setter TargetName="SenderName" Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
 
@@ -399,8 +388,8 @@
                                                     <Setter TargetName="Bubble" Property="HorizontalAlignment" Value="Center"/>
                                                     <Setter TargetName="Bubble" Property="Background" Value="Transparent"/>
                                                     <Setter TargetName="Bubble" Property="Padding" Value="0"/>
-                                                    <Setter TargetName="Bubble" Property="TextBlock.FontStyle" Value="Italic"/>
-                                                    <Setter TargetName="Bubble" Property="TextBlock.Foreground" Value="Gray"/>
+                                                    <Setter TargetName="MessageText" Property="FontStyle" Value="Italic"/>
+                                                    <Setter TargetName="MessageText" Property="Foreground" Value="Gray"/>
                                                 </DataTrigger>
                                             </DataTemplate.Triggers>
                                         </DataTemplate>
@@ -414,9 +403,12 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Name="ChatInputBox" Height="30" VerticalContentAlignment="Center" Padding="5,0" 
-                                Background="White" BorderBrush="#CCC" KeyDown="ChatInputBox_KeyDown"/>
+                                         Background="{DynamicResource BackgroundBrush}" 
+                                         Foreground="{DynamicResource TextDarkBrush}"
+                                         BorderBrush="{DynamicResource BorderBrush}" 
+                                         KeyDown="ChatInputBox_KeyDown"/>
                                 <Button x:Name="SendButton" Grid.Column="1" Width="30" Height="30" Margin="5,0,0,0" 
-                                Background="Transparent" BorderThickness="0" Click="SendButton_Click" Cursor="Hand">
+                                        Background="Transparent" BorderThickness="0" Click="SendButton_Click" Cursor="Hand">
                                     <Image Source="/Assets/Button/send_icon.png" Stretch="Uniform"/>
                                 </Button>
                             </Grid>

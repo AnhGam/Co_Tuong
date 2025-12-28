@@ -8,12 +8,6 @@
              FontFamily="Georgia">
 
     <UserControl.Resources>
-        <SolidColorBrush x:Key="PrimaryBrush" Color="#b99556"/>
-        <SolidColorBrush x:Key="BackgroundBrush" Color="#FDF8F0"/>
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextDarkBrush" Color="#4E342E"/>
-        <SolidColorBrush x:Key="TextGrayBrush" Color="#8D6E63"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#D7CCC8"/>
 
         <Style x:Key="MinimalScrollBarThumb" TargetType="{x:Type Thumb}">
             <Setter Property="Template">
@@ -113,7 +107,7 @@
         <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="22"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
             <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
 
@@ -149,7 +143,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -157,7 +151,7 @@
 
         <Grid Grid.Row="0" Margin="0,20,0,10">
             <TextBlock Text="Settings Menu" FontSize="40" FontWeight="Bold" 
-                       Foreground="{StaticResource TextDarkBrush}" HorizontalAlignment="Center">
+                       Foreground="{DynamicResource TextDarkBrush}" HorizontalAlignment="Center">
                 <TextBlock.Effect>
                     <DropShadowEffect Color="#D7CCC8" BlurRadius="2" ShadowDepth="2" Opacity="0.5"/>
                 </TextBlock.Effect>
@@ -166,11 +160,11 @@
             <Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,30,0"
                     Background="Transparent" BorderThickness="0" Cursor="Hand"
                     Click="CloseButton_Click">
-                <TextBlock Text="✕" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextDarkBrush}"/>
+                <TextBlock Text="✕" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextDarkBrush}"/>
             </Button>
         </Grid>
 
-        <Border Grid.Row="1" Background="{StaticResource CardBackgroundBrush}" 
+        <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" 
                 BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" 
                 CornerRadius="10" MaxWidth="900" Margin="40,0,40,40">
             <Border.Effect>
@@ -189,25 +183,25 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Music Volume" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
+                            <TextBlock Text="Music Volume" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Slider x:Name="MusicSlider" Maximum="1.0" TickFrequency="0.1" ValueChanged="MusicSlider_ValueChanged"/>
-                                <TextBlock Grid.Column="1" Text="🔊" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="🔊" Foreground="{DynamicResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="Sound Effects Volume" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
+                            <TextBlock Text="Sound Effects Volume" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Slider x:Name="SFXSlider" Maximum="1.0" TickFrequency="0.1" ValueChanged="SFXSlider_ValueChanged"/>
-                                <TextBlock Grid.Column="1" Text="🎵" Foreground="{StaticResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="🎵" Foreground="{DynamicResource TextGrayBrush}" FontSize="18" Margin="15,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
                     </Grid>
@@ -241,7 +235,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Margin="0,0,20,0">
-                                    <TextBlock Text="Display Name" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,5"/>
+                                    <TextBlock Text="Display Name" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,5"/>
                                     <TextBox x:Name="NameInput" Text="Enter your name..." Padding="10"/>
                                 </StackPanel>
                             </Grid>
@@ -251,10 +245,20 @@
                     <TextBlock Text="Game Settings" Style="{StaticResource SectionHeaderStyle}"/>
                     <Border Style="{StaticResource SectionDividerStyle}"/>
                     <StackPanel Margin="0,0,0,40">
-                        <TextBlock Text="Piece Style" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10" FontWeight="SemiBold"/>
+                        <TextBlock Text="Piece Style" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,10" FontWeight="SemiBold"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                            <RadioButton x:Name="RadioText" Content="Text (Traditional)" GroupName="PieceStyle" Margin="0,0,30,0" Checked="PieceStyle_Checked" Foreground="{StaticResource TextDarkBrush}"/>
-                            <RadioButton x:Name="RadioImage" Content="Image (Artistic)" GroupName="PieceStyle" Checked="PieceStyle_Checked" Foreground="{StaticResource TextDarkBrush}"/>
+                            <RadioButton x:Name="RadioText" Content="Text (Traditional)" GroupName="PieceStyle" Margin="0,0,30,0" Checked="PieceStyle_Checked" Foreground="{DynamicResource TextDarkBrush}"/>
+                            <RadioButton x:Name="RadioImage" Content="Image (Artistic)" GroupName="PieceStyle" Checked="PieceStyle_Checked" Foreground="{DynamicResource TextDarkBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="Theme Settings" Style="{StaticResource SectionHeaderStyle}"/>
+                    <Border Style="{StaticResource SectionDividerStyle}"/>
+                    <StackPanel Margin="0,0,0,40">
+                        <TextBlock Text="Appearance Mode" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,10" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                            <RadioButton x:Name="RadioLight" Content="Light Mode" GroupName="AppTheme" Margin="0,0,30,0" Checked="AppearanceMode_Checked" Foreground="{DynamicResource TextDarkBrush}"/>
+                            <RadioButton x:Name="RadioDark" Content="Dark Mode" GroupName="AppTheme" Checked="AppearanceMode_Checked" Foreground="{DynamicResource TextDarkBrush}"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -278,7 +282,7 @@
                     <Border Style="{StaticResource SectionDividerStyle}"/>
                     <Grid Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Select Track" Foreground="{StaticResource TextGrayBrush}" Margin="0,0,0,10"/>
+                            <TextBlock Text="Select Track" Foreground="{DynamicResource TextGrayBrush}" Margin="0,0,0,10"/>
                             <ComboBox x:Name="MusicCombo" Padding="10,5" SelectionChanged="MusicCombo_SelectionChanged">
                                 <ComboBoxItem Content="Special" Tag="Special.mp3"/>
                                 <ComboBoxItem Content="Tri Ngã" Tag="TriNga~.mp3"/>

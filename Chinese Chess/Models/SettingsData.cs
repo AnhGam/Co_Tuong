@@ -13,6 +13,7 @@ namespace Chinese_Chess.Models
         public string PlayerName { get; set; }
         public string AvatarPath { get; set; }
         public string PieceStyleSuffix { get; set; }
+        public string AppTheme { get; set; }
         public string CurrentMusicTrack { get; set; }
         public string CurrentBoardBackground { get; set; }
     }

@@ -35,6 +35,9 @@ namespace Chinese_Chess.Views
             if (AppSettings.PieceStyleSuffix == "_text") RadioText.IsChecked = true;
             else RadioImage.IsChecked = true;
 
+            if (AppSettings.AppTheme == "light") RadioLight.IsChecked = true;
+            else RadioDark.IsChecked = true;
+
             foreach (ComboBoxItem item in MusicCombo.Items)
             {
                 if (item.Tag.ToString() == AppSettings.CurrentMusicTrack)
@@ -116,6 +119,7 @@ namespace Chinese_Chess.Views
             if (Math.Abs(SFXSlider.Value - _originalState.SFXVolume) > 0.01) return true;
 
             if (AppSettings.PieceStyleSuffix != _originalState.PieceStyleSuffix) return true;
+            if (AppSettings.AppTheme != _originalState.AppTheme) return true;
             if (AppSettings.CurrentBoardBackground != _originalState.CurrentBoardBackground) return true;
             if (AppSettings.CurrentMusicTrack != _originalState.CurrentMusicTrack) return true;
             if (AppSettings.AvatarPath != _originalState.AvatarPath) return true;
@@ -151,6 +155,13 @@ namespace Chinese_Chess.Views
         {
             if (RadioText.IsChecked == true) AppSettings.PieceStyleSuffix = "_text";
             else AppSettings.PieceStyleSuffix = "_img";
+            AppSettings.TriggerChange();
+        }
+
+        private void AppearanceMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (RadioLight.IsChecked == true) AppSettings.AppTheme = "light";
+            else AppSettings.AppTheme = "dark";
             AppSettings.TriggerChange();
         }
 

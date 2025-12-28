@@ -14,6 +14,7 @@ namespace Chinese_Chess.Models
         public static string PlayerName { get; set; } = "Player 1";
         public static string AvatarPath { get; set; } = "pack://application:,,,/Chinese Chess;component/Assets/ImagePiece/red_general_img.png";
         public static string PieceStyleSuffix { get; set; } = "_text";
+        public static string AppTheme { get; set; } = "light";
         public static string CurrentMusicTrack { get; set; } = "1.mp3";
         public static string CurrentBoardBackground { get; set; } = "pack://application:,,,/Chinese Chess;component/Assets/Background/Background.png";
 
@@ -31,6 +32,7 @@ namespace Chinese_Chess.Models
                 PlayerName = PlayerName,
                 AvatarPath = AvatarPath,
                 PieceStyleSuffix = PieceStyleSuffix,
+                AppTheme = AppTheme,
                 CurrentMusicTrack = CurrentMusicTrack,
                 CurrentBoardBackground = CurrentBoardBackground
             };
@@ -52,6 +54,7 @@ namespace Chinese_Chess.Models
                 PlayerName = data.PlayerName;
                 AvatarPath = data.AvatarPath;
                 PieceStyleSuffix = data.PieceStyleSuffix;
+                AppTheme = data.AppTheme;
                 CurrentMusicTrack = data.CurrentMusicTrack;
                 CurrentBoardBackground = data.CurrentBoardBackground;
             }
@@ -67,6 +70,7 @@ namespace Chinese_Chess.Models
                 PlayerName = PlayerName,
                 AvatarPath = AvatarPath,
                 PieceStyleSuffix = PieceStyleSuffix,
+                AppTheme = AppTheme,
                 CurrentMusicTrack = CurrentMusicTrack,
                 CurrentBoardBackground = CurrentBoardBackground
             };
@@ -80,6 +84,7 @@ namespace Chinese_Chess.Models
             PlayerName = data.PlayerName;
             AvatarPath = data.AvatarPath;
             PieceStyleSuffix = data.PieceStyleSuffix;
+            AppTheme = data.AppTheme;
             CurrentMusicTrack = data.CurrentMusicTrack;
             CurrentBoardBackground = data.CurrentBoardBackground;
             TriggerChange(); 

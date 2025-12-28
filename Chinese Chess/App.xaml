@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:Chinese_Chess"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#b99556"/>
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#FDF8F0"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextDarkBrush" Color="#4E342E"/>
+        <SolidColorBrush x:Key="TextGrayBrush" Color="#8D6E63"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D7CCC8"/>
     </Application.Resources>
 </Application>
