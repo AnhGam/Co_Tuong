@@ -20,7 +20,7 @@ Dự án là một ứng dụng Cờ Tướng (Chinese Chess) được xây dự
     - **Chat System:** Tích hợp khung chat trực tuyến giữa hai người chơi trong thời gian thực.
 
 ### 3. Giao diện & Trải nghiệm (UI/UX)
-- Thiết kế theo phong cách Modern UI với Dark Theme chủ đạo.
+- Thiết kế theo phong cách Modern UI, có thể chuyển đổi Light/Dark Mode tùy thích.
 - Animation mượt mà khi di chuyển quân cờ và tương tác bàn cờ.
 - Hỗ trợ Settings: Tùy chỉnh âm thanh, theme bàn cờ và quân cờ.
 
